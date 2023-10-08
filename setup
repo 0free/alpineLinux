@@ -1,0 +1,11 @@
+#!/bin/ash
+if curl -so /dev/null alpinelinux.org; then
+    printf '%s\n' '>>> downloading alpine linux setup script'
+    curl -so ~/setup.sh https://raw.githubusercontent.com/0free/alpineLinux/edge/setup.sh
+    ash ~/setup.sh
+    if [ -f /mnt/reboot ]; then
+        ash ~/setup.sh
+    fi
+else
+    printf '%s\n' 'no internet'
+fi
