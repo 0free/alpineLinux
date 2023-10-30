@@ -82,20 +82,19 @@ kernel() {
 
     if printf $kernel | grep -q '\-rc'; then
         extraVersion=$(printf $kernel | sed 's|.*-|-|')
-        file="linux-$kernel.tar.gz"
-        url="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot/$file"
     else
         extraVersion=''
-        file="linux-$kernel.tar.xz"
-        url="https://cdn.kernel.org/pub/linux/kernel/v$version.x/$file"
     fi
+
+    file="linux-$kernel.tar.gz"
+    url="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot/$file"
 
     if printf "$choice" | grep -q 'build linux-'; then
 
         if [ ! -d ~/linux-$kernel/ ]; then
             if [ ! -f ~/$file ]; then
                 printf '%s\n' "❯ downloading linux-$kernel src"
-                curl -o ~/$file $url || printf '%s\n' "ERROR: can't download src" && exit
+                curl -o ~/$file $url
             fi
             if [ -f ~/$file ]; then
                 printf '%s\n' "❯ extracting linux-$kernel src"
