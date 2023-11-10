@@ -27,7 +27,7 @@ kernel() {
 
     if curl -so /dev/null git.kernel.org; then
 
-        makefile="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plain/Makefile"
+        makefile='https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plain/Makefile'
 
         printf '%s\n' '❯ getting linux kernel Torvalds release'
         url="$makefile"
@@ -36,24 +36,6 @@ kernel() {
         set -- "build linux-$kernel"
 
         makefile='https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/Makefile'
-
-        printf '%s\n' '❯ getting linux kernel mainline release'
-        url="$makefile"
-        curl -so ~/Makefile $url
-        get_kernel_version ~/Makefile
-        set -- "$@" "build linux-$kernel mainline"
-
-        printf '%s\n' '❯ getting linux kernel LTS release'
-        url="$makefile?h=linux-rolling-lts"
-        curl -so ~/Makefile $url
-        get_kernel_version ~/Makefile
-        set -- "$@" "build linux-$kernel LTS"
-
-        printf '%s\n' '❯ getting linux kernel rolling release'
-        url="$makefile?h=linux-rolling-stable"
-        curl -so ~/Makefile $url
-        get_kernel_version ~/Makefile
-        set -- "$@" "build linux-$kernel rolling"
 
         printf '%s\n' '❯ getting linux kernel stable release'
         url="$makefile?h=linux-$version.$patchLevel.y"
@@ -64,6 +46,24 @@ kernel() {
         curl -so ~/Makefile $url
         get_kernel_version ~/Makefile
         set -- "$@" "build linux-$kernel stable"
+
+        printf '%s\n' '❯ getting linux kernel mainline release'
+        url="$makefile"
+        curl -so ~/Makefile $url
+        get_kernel_version ~/Makefile
+        set -- "$@" "build linux-$kernel mainline"
+
+        printf '%s\n' '❯ getting linux kernel rolling release'
+        url="$makefile?h=linux-rolling-stable"
+        curl -so ~/Makefile $url
+        get_kernel_version ~/Makefile
+        set -- "$@" "build linux-$kernel rolling"
+
+        printf '%s\n' '❯ getting linux kernel LTS release'
+        url="$makefile?h=linux-rolling-lts"
+        curl -so ~/Makefile $url
+        get_kernel_version ~/Makefile
+        set -- "$@" "build linux-$kernel LTS"
 
     fi
 
@@ -82,12 +82,13 @@ kernel() {
 
     if printf $kernel | grep -q '\-rc'; then
         extraVersion=$(printf $kernel | sed 's|.*-|-|')
+        file="linux-$kernel.tar.gz"
+        url="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot/$file"
     else
+        file="linux-$kernel.tar.xz"
+        url="https://cdn.kernel.org/pub/linux/kernel/v$version.x/$file"
         extraVersion=''
     fi
-
-    file="linux-$kernel.tar.gz"
-    url="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot/$file"
 
     if printf "$choice" | grep -q 'build linux-'; then
 
