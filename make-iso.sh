@@ -3,7 +3,7 @@
 clear && cd ~
 
 set -- alpine-conf alpine-sdk apk-tools build-base busybox dosfstools fakeroot git mtools squashfs-tools xorriso grub grub-efi
-doas apk add --no-cache $@
+doas apk add $@
 
 USER=$(whoami)
 
@@ -32,14 +32,6 @@ export apks_base='alpine-base alpine-baselayout alpine-baselayout-data alpine-co
 
 if [ $desktop = 'gnome' ]; then
     export apks_desktop='adwaita-icon-theme font-cantarell gdm gdm-openrc gnome-autoar gnome-bluetooth gnome-bluetooth-libs gnome-console gnome-control-center gnome-desktop gnome-session gnome-settings-daemon gnome-shell gnome-shell-schemas gnome-system-monitor gsettings-desktop-schemas mutter mutter-schemas nautilus network-manager-applet polkit-gnome'
-fi
-
-if [ $desktop = 'kde' ]; then
-    export apks_desktop='sddm sddm-openrc ark bluedevil breeze breeze-gtk breeze-icons dolphin dolphin-plugins font-hack font-noto hunspell hunspell-en kactivitymanagerd kate kate-common kmix knotifications konsole kparts kpipewire krunner kscreenlocker kservice ksysguard ktexteditor kwayland kwin kwindowsystem kwrited plasma-disks plasma-firewall plasma-framework plasma-integration plasma-nm plasma-settings plasma-thunderbolt plasma-workspace polkit-kde-agent-1 powerdevil'
-fi
-
-if [ $desktop = 'xfce' ]; then
-    export apks_desktop='adwaita-icon-theme font-cursor-misc font-dejavu font-misc-misc network-manager-applet thunar thunar-archive-plugin thunar-volman tumbler xauth xfce4-appfinder xfce4-battery-plugin xfce4-notifyd xfce4-panel xfce4-power-manager xfce4-sensors-plugin xfce4-session xfce4-settings xfce4-skel xfce4-statusnotifier-plugin xfce4-taskmanager xfce4-terminal xfce4-xkb-plugin xfconf xfdesktop xfwm4 xinit xorg-server'
 fi
 
 cat > ~/aports/scripts/mkimg.linux.sh <<EOF

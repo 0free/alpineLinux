@@ -126,42 +126,11 @@ EOF
 
 fi
 
-if [ $desktop = 'kde' ]; then
-
-    session='/usr/share/wayland-sessions/plasma.desktop'
-    terminal='konsole'
-
-    mkdir -p $tmp/etc/sddm.conf.d/
-    makefile root:root 0644 $tmp/etc/sddm.conf.d/autologin <<EOF
-[Autologin]
-User=root
-Session=plasma.desktop
-Relogin=true
-EOF
-
-fi
-
-if [ $desktop = 'xfce' ]; then
-
-    session='/usr/share/xsessions/xfce.desktop'
-    terminal='xfce4-terminal'
-
-    makefile root:root 0755 $tmp/etc/profile.d/session.sh <<EOF
-#!/bin/ash
-if [ -z \$DISPLAY ]; then
-    if [ -f /usr/bin/startxfce4 ]; then
-        startxfce4
-    fi
-fi
-EOF
-
-fi
-
 services sysinit devfs dmesg mdev hwdrivers modloop udev udev-trigger udev-settle udev-postmount
 
 services boot procfs devfs sysfs root modules ntpd hwclock swclock sysctl hostname bootmisc syslog dbus networking efivars cgroups zcommon znvpair spl zavl zlua zunicode zzstd icp zfs
 
-services default acpid crond iwd networkmanager networkmanager-dispatcher alsa bluez bluealsa bluetooth openrc-settingsd elogind polkit local gdm sddm
+services default acpid crond iwd networkmanager networkmanager-dispatcher alsa bluez bluealsa bluetooth openrc-settingsd elogind polkit local gdm
 
 services shutdown mount-ro killprocs savecache
 
