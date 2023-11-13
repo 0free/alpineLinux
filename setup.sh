@@ -19,7 +19,6 @@ packages_list() {
         udev-init-scripts udev-init-scripts-openrc
         #eudev
         eudev eudev-openrc eudev-libs
-        xwayland
         #mesa
         mesa-dri-gallium
         #polkit/elogind
@@ -29,24 +28,17 @@ packages_list() {
         xf86-input-evdev xf86-input-mtrack xf86-input-synaptics
         #base
         doas fakeroot file
-        g++ gcc libc-dev patch make autoconf
-        sed attr dialog which grep gawk
-        pciutils usbutils findutils readline
-        lsof less curl wget
+        g++ gcc libc-dev patch make autoconf sed attr dialog which grep gawk pciutils usbutils findutils readline lsof less curl wget
         #bash
         bash bash-completion
         #util-linux
-        util-linux util-linux-openrc util-linux-login
-        util-linux-misc
-        runuser
+        util-linux util-linux-openrc util-linux-login util-linux-misc runuser
         #utilities
         openssl ncurses-dev
         #git
         git
         #compression
         brotli-libs zstd zlib zip lz4 lzo unzip xz bzip2 gzip
-        #nvme
-        nvme-cli
         #disks
         e2fsprogs gptfdisk dosfstools mtools
         ntfs-3g ntfs-3g-progs
@@ -63,10 +55,7 @@ packages_list() {
         nftables nftables-openrc
         firewalld firewalld-openrc
         #pipewire
-        pipewire pipewire-libs pipewire-alsa pipewire-jack pipewire-pulse
-        pipewire-tools
-        pipewire-spa-tools pipewire-spa-vulkan pipewire-spa-bluez
-        wireplumber
+        pipewire pipewire-libs pipewire-alsa pipewire-jack pipewire-pulse pipewire-tools pipewire-spa-tools pipewire-spa-vulkan pipewire-spa-bluez wireplumber
         #alsa
         alsaconf alsa-lib alsa-utils alsa-utils-openrc
         alsa-plugins-pulse alsa-plugins-jack alsa-ucm-conf 
@@ -192,41 +181,25 @@ packages_list() {
         "
     fi
 
-    if grep -q xfce /root/list; then
-        packages="$packages
-        #lightdm
-        lightdm lightdm-openrc lightdm-gtk-greeter
-        #xfce4
-        xfdesktop xfce4-session xfwm4 xfce4-settings
-        #icons
-        adwaita-icon-theme
-        #config
-        xfce4-skel xfconf
-        #tools
-        xfce4-panel xfce4-panel-profiles
-        xfce4-appfinder xfce4-notifyd xfce4-power-manager xfce4-taskmanager
-        xfce4-terminal xfce4-mixer xfce4-screenshooter
-        #plugins
-        xfce4-battery-plugin xfce4-places-plugin xfce4-pulseaudio-plugin
-        xfce4-sensors-plugin xfce4-statusnotifier-plugin xfce4-systemload-plugin
-        xfce4-whiskermenu-plugin xfce4-xkb-plugin
-        #thunar
-        thunar thunar-volman thunar-archive-plugin
-        #thumbnail
-        tumbler
-        "
-    fi
-
-    if grep -q PaperDE /root/list; then
-        packages="$packages
-        adwaita-icon-theme paperde alacritty
-        "
-    fi
-
     if grep -q wayfire /root/list; then
         packages="$packages
         adwaita-icon-theme
-        wayfire wcm wf-config waybar wofi alacritty
+        wayfire wcm wf-config waybar havoc
+        "
+    fi
+
+    if ! grep -q 'no-desktop' /root/list; then
+        packages="$packages
+        #wine
+        wine wine-mono
+        #razer
+        openrazer-driver-dkms razergenie
+        #printer
+        cups cups-openrc cups-pdf bluez-cups
+        #driver
+        xinput gkraken ccid solaar
+        razercfg razercfg-gui razergenie openrazer
+        piper
         "
     fi
 
@@ -310,8 +283,6 @@ packages_list() {
         packages="$packages
         #shell
         starship
-        #wine
-        wine wine-mono
         #thumbnail
         ffmpegthumbnailer
         #mkimage
@@ -360,12 +331,6 @@ packages_list() {
         mplayer totem celluloid
         #photos
         krita gimp inkscape gmic curtail
-        #printer
-        cups cups-openrc cups-pdf bluez-cups
-        #driver
-        xinput gkraken ccid solaar
-        razercfg razercfg-gui razergenie openrazer
-        piper
         #finance
         homebank
         #2d
@@ -489,7 +454,7 @@ menu() {
     output=$2
     shift 2
     n=1
-    while :; do
+    while true; do
         eval "c=\${$n}"
         for i in "$@"; do
             if [ "$i" = "$c" ]; then
@@ -504,7 +469,7 @@ menu() {
             $(printf '\e[B')) [ $n -lt $# ] && n=$((n+1));;
             '') break;;
         esac
-        printf '\e[%sA' $#
+        printf -- '\e[%sA' $#
     done
     export "$output"="$c"
 
@@ -513,14 +478,14 @@ menu() {
 init_drive() {
 
     printf '%s\n' '❯ created by Saif AlSubhi'
-    for i in $(seq 1 100); do printf '-%.0s' $i; done
+    for i in $(seq 1 100); do printf -- '-%.0s' $i; done
     printf '\n'
     lsblk -o name,type,fstype,size,fsused,mountpoint,parttypename,label,model
-    for i in $(seq 1 100); do printf '-%.0s' $i; done
+    for i in $(seq 1 100); do printf -- '-%.0s' $i; done
     printf '\n'
 
     if [ ! -f /root/list ]; then
-        printf '' > /root/list
+        printf "" > /root/list
     fi
 
     if ! grep -q 'drive=' /root/list; then
@@ -530,14 +495,14 @@ init_drive() {
         if find /dev | grep -Eq "$drive[p][1-9]|$drive[1-9]"; then
             set -- $(find $drive*)
             menu 'use the complete drive or select a root partition' partition $@
-            if [ "$drive" != "$partition" ]; then
+            if [ "$drive" -ne "$partition" ]; then
                 rootDrive=$partition
                 set -- $(find $drive*[1-9]* | grep -v $partition)
-                if [ "$*" != '' ]; then
+                if [ "$*" -ne "" ]; then
                     menu 'select a boot partition' bootDrive $@
                 fi
                 set -- $(find $drive*[1-9]* | grep-Ev "$rootDrive|$bootDrive")
-                if [ "$*" != '' ]; then
+                if [ "$*" -ne "''" ]; then
                     menu 'select a swap partition' swapDrive $@
                 fi
             fi
@@ -556,6 +521,10 @@ init_drive() {
         printf '%s\n' "filesystem=$filesystem" >> /root/list
     fi
 
+}
+
+init_system() {
+
     if ! grep -q 'computer=' /root/list; then
         set -- minimal miner server virtual workstation
         menu 'select a computer' computer $@
@@ -563,14 +532,14 @@ init_drive() {
     fi
 
     if ! grep -q 'desktop=' /root/list; then
-        set -- kde gnome xfce4 wayfire PaperDE no-desktop
+        set -- kde gnome wayfire no-desktop
         menu 'select a desktop' desktop $@
         printf '%s\n' "desktop=$desktop" >> /root/list
     fi
 
     if ! grep -q 'bootloader=' /root/list; then
         if [ "$filesystem" = zfs ]; then
-            set -- gummiboot clover grub
+            set -- gummiboot grub
         elif [ "$filesystem" = btrfs ]; then
             set -- gummiboot clover rEFInd grub
         else
@@ -584,7 +553,7 @@ init_drive() {
 
 }
 
-setup_user() {
+init_user() {
 
     if ! grep -q 'user=' /root/list; then
         while ! printf '%s' $user | grep -Eiq '^[a-z_][-a-z0-9._-]*$'; do
@@ -592,44 +561,45 @@ setup_user() {
         done
         printf '%s\n' "user=$user" >> /root/list
     fi
+
     if ! grep -q 'password=' /root/list; then
         while ! printf '%s' $password | grep -Eiq '^[a-z0-9._-].{1,16}$'; do
             printf '❯ password: ' && read -r password
         done
         printf '%s\n' "password=$password" >> /root/list
     fi
-    if ! grep -q 'hostname=' /root/list; then
-        while ! printf '%s' $hostname | grep -Eiq '^[a-z0-9][-a-z0-9._-]*$'; do
-            printf '❯ hostname: ' && read -r hostname
-        done
-        printf '%s\n' "hostname=$hostname" >> /root/list
-    fi
+
     printf '\n'
 
 }
 
 setup_drive() {
 
-    if ! test sgdisk; then
-        printf '%s\n' "❯ installing sgdisk"
-        apk add sgdisk
-    fi
     if ! df -Th | grep -v tmpfs | grep -q '/mnt'; then
         format_drive
     fi
+
     if ! df -Th | grep -v tmpfs | grep -q $rootDrive; then
         mount_root
     fi
+
     if ! df -Th | grep -v tmpfs | grep -q $bootDrive; then
         mount_boot
     fi
+
     if df -Th | grep -v tmpfs | grep -Eq "$rootDrive|$bootDrive"; then
         install_base
+        change_root
     fi
 
 }
 
 format_drive() {
+
+    if [ ! -f /usr/bin/sgdisk ]; then
+        printf '%s\n' "❯ installing sgdisk"
+        apk add sgdisk
+    fi
 
     printf '%s\n' "❯ wiping filesystm"
     wipefs -a -f $drive
@@ -704,7 +674,8 @@ create_zfs() {
         exit
     fi
     printf '%s\n' "❯ creating ZFS pool"
-    zpool create -f -o ashift=12 -o autotrim=on \
+    zpool create -f -o ashift=12 -o \
+    -o autotrim=on \
     -o cachefile=/etc/zfs/zpool.cache \
     -O logbias=throughput -O compression=lz4 \
     -O primarycache=metadata -O secondarycache=metadata -O sync=always \
@@ -775,6 +746,16 @@ mount_root() {
 
 mount_boot() {
 
+    if [ -f /lib/modules/"$(uname -r)"/kernel/fs/efivarfs/efivarfs.ko.gz ]; then
+        printf '%s\n' "❯ loading efivarfs kernel module"
+        modprobe efivarfs
+    fi
+
+    if [ -f /lib/modules/"$(uname -r)"/kernel/drivers/firmware/efi/efivars.ko.gz ]; then
+        printf '%s\n' "❯ loading efivars kernel module"
+        modprobe efivars
+    fi
+
     printf '%s\n' "❯ mounting boot drive"
     mount -t vfat $bootDrive /mnt/boot
     mkdir -p /mnt/boot/efi/boot/
@@ -798,68 +779,59 @@ EOF
     printf '%s\n' "❯ copying repositories"
     cp /etc/apk/repositories /mnt/etc/apk/
 
-    printf '%s\n' "❯ fixing /dev/null"
-    chmod 0666 /mnt/dev/null
+    printf '%s\n' "❯ adding CloudFlare DNS"
+    cat > /mnt/etc/resolv.conf <<EOF
+nameserver 1.0.0.1
+EOF
 
-    if [ -f /lib/modules/"$(uname -r)"/kernel/fs/efivarfs/efivarfs.ko.gz ]; then
-        printf '%s\n' "❯ loading efivarfs kernel module"
-        modprobe efivarfs
-    fi
-    if [ -f /lib/modules/"$(uname -r)"/kernel/drivers/firmware/efi/efivars.ko.gz ]; then
-        printf '%s\n' "❯ loading efivars kernel module"
-        modprobe efivars
-    fi
-
-    set_network
-    set_fstab
-    setup_linux
+    printf '%s\n' "❯ chmod 666 /dev/null"
+    chmod 666 /mnt/dev/null
 
 }
 
-set_network() {
+change_root() {
 
-    printf '%s\n' "❯ adding DNS"
-    cat > /mnt/etc/resolv.conf <<EOF
-nameserver 94.140.14.49
-nameserver 94.140.14.59
-EOF
-    printf '%s\n' "❯ adding interfaces"
-    cat > /mnt/etc/network/interfaces <<EOF
-auto lo
-iface lo inet loopback
+    printf '%s\n' "❯ copying install script"
+    cp /root/list /mnt/root/
+    cp /root/setup.sh /mnt/root/
 
-auto eth0
-iface eth0 inet dhcp
+    printf '%s\n' "❯ changing root"
 
-auto wlan0
-iface wlan0 inet dhcp
-EOF
+    mount --bind /dev /mnt/dev
+    mount --bind /sys /mnt/sys
+    mount --bind /proc /mnt/proc
+    mount --bind /run /mnt/run
+    mount --bind /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars
+
+    printf '%s' '0' > /mnt/root/chroot
+    chroot /mnt /bin/ash /root/setup.sh
 
 }
 
 set_fstab() {
 
     printf '%s\n' "❯ setting fstab"
+
+    entry="tmpfs /tmp tmpfs defaults,nosuid,nodev 0 0"
+    printf '%s\n' "$entry" > /etc/fstab
+
     if grep -q zfs /root/list; then
-        entry="#$ZFSpool / $filesystem rw,nodev,noauto,xattr,zfsutil,posixacl 0 0"
+        entry="#$ZFSpool / $filesystem rw,nodev,noauto,xattr,zfsutil,posixacl 0 1"
     elif grep -q btrfs /root/list; then
-        entry="$(blkid $rootDrive -o export | grep ^UUID=) / $filesystem rw,ssd,nofail,discard=async,noatime,commit=64,autodefrag,compress=zstd:10 0 0"
+        entry="$(blkid $rootDrive -o export | grep ^UUID=) / $filesystem rw,ssd,nofail,discard=async,noatime,commit=64,autodefrag,compress=zstd:10 0 1"
     else
-        entry="$(blkid $rootDrive -o export | grep ^UUID=) / $filesystem rw,ssd,nofail,discard=async,noatime,commit=64,autodefrag,compress=zstd:10 0 0"
+        entry="$(blkid $rootDrive -o export | grep ^UUID=) / $filesystem rw,ssd,nofail,discard=async,noatime,commit=64,autodefrag,compress=zstd:10 0 1"
     fi
-    printf '%s\n' "$entry" > /mnt/etc/fstab
-    printf '%s\n' "$(blkid $bootDrive -o export | grep ^UUID=) /boot vfat rw,noatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro 0 0" >> /mnt/etc/fstab
+
+    printf '%s\n' "$entry" >> /etc/fstab
+
+    printf '%s\n' "$(blkid $bootDrive -o export | grep ^UUID=) /boot vfat rw,noatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro 0 2" >> /etc/fstab
+
     if grep -q swapDrive /root/list; then
-        printf '%s\n' "$(blkid $swapDrive -o export | grep ^UUID=) none swap sw 0 0" >> /mnt/etc/fstab
+        printf '%s\n' "$(blkid $swapDrive -o export | grep ^UUID=) none swap sw 0 0" >> /etc/fstab
     fi
 
-}
-
-setup_linux() {
-
-    install_linux
-    install_packages
-    change_root
+    printf '%s' '1' > /root/chroot
 
 }
 
@@ -891,9 +863,11 @@ install_linux() {
     fi
 
     printf '%s\n' "❯ installing linux"
-    apk --root=/mnt update
-    apk --root=/mnt fix
-    apk --root=/mnt add $list
+    apk update
+    apk fix
+    apk add $list
+
+    printf '%s' '2' > /root/chroot
 
 }
 
@@ -908,53 +882,11 @@ install_packages() {
         fi
     done
     printf '%s\n' "❯ installing packages"
-    apk --root=/mnt update
-    apk --root=/mnt fix
-    apk --root=/mnt add $list
+    apk update
+    apk fix
+    apk add $list
 
-}
-
-change_root() {
-
-    printf '%s\n' "❯ copying install script"
-    cp /root/list /mnt/root/
-    cp /root/setup.sh /mnt/root/
-    printf '%s\n' "❯ changing root"
-    printf '%s' '' > /mnt/root/chroot
-    mount -t proc none /mnt/proc
-    mount -o bind /dev /mnt/dev
-    mount -o bind /sys /mnt/sys
-    mount -t efivarfs none /mnt/sys/firmware/efi/efivars
-    chroot /mnt /bin/ash /root/setup.sh
-
-}
-
-configure() {
-
-    set_timezone
-    set_host
-    disable_root
-    create_user
-    setup_desktop
-
-}
-
-set_timezone() {
-
-    printf '%s\n' "❯ setting timezone"
-    if [ -f /usr/share/zoneinfo/$timezone ]; then
-        install -Dm 0644 /usr/share/zoneinfo/$timezone /etc/localtime
-        printf '%s\n' $timezone > /etc/timezone
-    fi
-
-}
-
-set_host() {
-
-    printf '%s\n' "❯ setting hostname"
-    printf '%s\n' $hostname > /etc/hostname
-    printf '%s\n' "127.0.0.1 localhost $hostname" > /etc/hosts
-    printf '%s\n' "::1       localhost $hostname" >> /etc/hosts
+    printf '%s' '3' > /root/chroot
 
 }
 
@@ -963,6 +895,8 @@ disable_root() {
     printf '%s\n' "❯ disabling root login"
     passwd -l root
     sed -i 's|:/bin/ash|:/sbin/nologin|' /etc/passwd
+
+    printf '%s' '4' > /root/chroot
 
 }
 
@@ -983,57 +917,11 @@ create_user() {
     mkdir -p $HOME/.config/autostart/
     mkdir -p $HOME/.local/
 
-}
-
-setup_desktop() {
-
-    enable_services
-    configure_alpine
-    configure_startup
-
-    if grep -q wayfire /root/list; then
-        configure_wayfire
-    fi
-
-    if [ -f /usr/bin/lightdm ]; then
-        configure_lightdm
-    fi
-
-    if [ -f /etc/greetd/config.toml ]; then
-        configure_greetd
-    fi
-
-    if ! grep -q virtual /root/list; then
-        if grep -q zfs /root/list; then
-            build_zfs
-        fi
-        install_nvidia
-    fi
-
-    if grep -q server /root/list; then
-        setup_mariadb
-        install_webserver
-    fi
-
-    if grep -q miner /root/list; then
-        install_miner
-    fi
-
-    if ! grep -Eq 'server|miner' /root/list; then
-        create_iso
-        install_office
-        openwrt
-    fi
-
-    custom_kernel
-    google_chrome
-    install_lutris
-    make_initramfs
-    setup_bootloader
+    printf '%s' '5' > /root/chroot
 
 }
 
-services() {
+add_service() {
 
     run_level=$1
     shift 1
@@ -1049,67 +937,69 @@ enable_services() {
 
     printf '%s\n' "❯ enabling services"
     #openrc
-    services sysinit 'devfs procfs dmesg hwdrivers root'
-    services boot 'modules cgroups mtab swap localmount sysctl hostname bootmisc networking machine-idntpd hwclock swclock'
-    services default 'local'
-    services shutdown 'mount-ro killprocs savecache'
+    add_service sysinit 'devfs procfs dmesg hwdrivers root'
+    add_service boot 'modules cgroups mtab swap localmount sysctl hostname bootmisc networking machine-idntpd hwclock swclock'
+    add_service default 'local'
+    add_service shutdown 'mount-ro killprocs savecache'
     #busybox
-    services sysinit 'mdev'
-    services boot 'syslog'
-    services default 'acpid crond'
+    add_service sysinit 'mdev'
+    add_service boot 'syslog'
+    add_service default 'acpid crond'
     #rsyslog
-    services boot 'rsyslog'
+    add_service boot 'rsyslog'
     #udev
-    services sysinit 'udev udev-trigger udev-settle udev-postmount'
+    add_service sysinit 'udev udev-trigger udev-settle udev-postmount'
     #zfs
-    services sysinit 'zfs-import zfs-mount'
-    services boot 'zfs-share zfs-zed zfs-load-key'
+    add_service sysinit 'zfs-import zfs-mount'
+    add_service boot 'zfs-share zfs-zed zfs-load-key'
     #apparmor
-    services boot apparmor
+    add_service boot apparmor
     #seatd
-    services boot 'seatd'
+    add_service boot 'seatd'
     #dbus
-    services boot 'dbus'
-    services default 'openrc-settingsd'
+    add_service boot 'dbus'
+    add_service default 'openrc-settingsd'
     #logind
-    services default 'elogind'
+    add_service default 'elogind'
     #polkit
-    services default 'polkit'
+    add_service default 'polkit'
     #musl
-    services default 'nscd'
+    add_service default 'nscd'
     #networkmanager
-    services default 'networkmanager networkmanager-dispatcher'
+    add_service default 'networkmanager networkmanager-dispatcher'
     #firewall
-    services default 'nftables firewalld'
+    add_service default 'nftables firewalld'
     #alsa
-    services default 'alsa'
+    add_service default 'alsa'
     #bluez
-    services default 'bluetooth bluealsa'
+    add_service default 'bluetooth bluealsa'
     #rsync
-    services default 'rsyncd'
+    add_service default 'rsyncd'
     #wireless
-    services default 'iwd'
+    add_service default 'iwd'
     #firmware
-    services default 'fwupd'
+    add_service default 'fwupd'
     #login-manager
-    services default 'gdm greetd lightdm sddm'
+    add_service default 'gdm lightdm sddm'
     #linux-tools
-    services default 'cpupower'
-    services boot 'usbip'
+    add_service default 'cpupower'
+    add_service boot 'usbip'
     #printer
-    services default 'cupsd'
+    add_service default 'cupsd'
     #database
-    services default 'mariadb'
+    add_service default 'mariadb'
     #web-server
-    services default 'litespeed'
+    add_service default 'litespeed'
     #mail-server
-    services default 'postfix dovecot opendkim'
+    add_service default 'postfix dovecot opendkim'
     #openvpn
-    services default 'openvpn'
+    add_service default 'openvpn'
     #rpcbind
-    services default 'rpcbind'
+    add_service default 'rpcbind'
     #syncthing
-    services default 'syncthing'
+    add_service default 'syncthing'
+
+    printf '%s' '6' > /root/chroot
 
 }
 
@@ -1130,6 +1020,42 @@ configure_alpine() {
     sed -i 's|#rc_send_sigkill=.*|rc_send_sigkill="YES"|' /etc/rc.conf
     sed -i 's|rc_tty_number=.*|rc_tty_number=0|' /etc/rc.conf
 
+    printf '%s\n' "❯ setting timezone"
+    if [ -f /usr/share/zoneinfo/$timezone ]; then
+        install -Dm 0644 /usr/share/zoneinfo/$timezone /etc/localtime
+        printf '%s\n' $timezone > /etc/timezone
+    fi
+
+    printf '%s\n' "❯ setting hostname"
+    printf '%s\n' 'alpineLinux' > /etc/hostname
+    printf '%s\n' "127.0.0.1 localhost alpineLinux" > /etc/hosts
+    printf '%s\n' "::1       localhost alpineLinux" >> /etc/hosts
+
+    printf '%s\n' "❯ adding interfaces"
+    cat > /mnt/etc/network/interfaces <<EOF
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+
+auto wlan0
+iface wlan0 inet dhcp
+EOF
+
+    printf '%s\n' "❯ configuring NetworkManager"
+    if [ -d /etc/NetworkManager/ ]; then
+        cat > /etc/NetworkManager/NetworkManager.conf <<EOF
+[main]
+dhcp=internal
+plugins=ifupdown,keyfile
+[ifupdown]
+managed=true
+[device]
+wifi.backend=iwd
+EOF
+    fi
+
     printf '%s\n' "❯ configuring alpineLinux"
 
     rm -f /etc/profile.d/color_prompt.sh.disabled
@@ -1141,18 +1067,6 @@ clock="local"
 clock_hctosys="NO"
 clock_systohc="YES"
 clock_args=""
-EOF
-    fi
-
-    if [ -d /etc/NetworkManager/ ]; then
-        cat > /etc/NetworkManager/NetworkManager.conf <<EOF
-[main]
-dhcp=internal
-plugins=ifupdown,keyfile
-[ifupdown]
-managed=true
-[device]
-wifi.backend=iwd
 EOF
     fi
 
@@ -1181,15 +1095,35 @@ EOF
     printf '%s\n' "❯ configuring firewalld"
     sed -i 's|^#.*||' /etc/firewalld/firewalld.conf
 
-    printf '%s\n' "❯ wayland"
-    cat > /etc/environment <<EOF
-XDG_SESSION_TYPE=wayland
-GDK_BACKEND=wayland
-QT_QPA_PLATFORM=wayland-egl
-QT_WAYLAND_FORCE_DPI=physical
-QT_WAYLAND_DISABLE_WINDOWDECORATION=1
-MOZ_ENABLE_WAYLAND=1
-EOF
+    printf '%s\n' "❯ setting ~/"
+    chown -R $user:wheel $HOME/
+    chown -R $user:wheel $HOME/.config/
+    chmod -R 700 $HOME/
+    chmod -R 700 $HOME/.config/
+
+    printf '%s' '7' > /root/chroot
+
+}
+
+setup_desktop() {
+
+    if [ -f /usr/bin/gnome-session ]; then
+        run_session='/usr/bin/gnome-session'
+        session='/usr/share/wayland-sessions/gnome-wayland.desktop'
+    fi
+
+    if [ -f /usr/bin/startplasma-wayland ]; then
+        run_session='/usr/bin/startplasma-wayland'
+        session='/usr/share/wayland-sessions/plasma.desktop'
+    fi
+
+    if [ -f /usr/bin/wayfire ]; then
+        run_session='/usr/bin/wayfire'
+        session='/usr/share/wayland-sessions/wayfire.desktop'
+        printf '%s\n' "❯ downloading wayfire ini"
+        url="https://raw.githubusercontent.com/0free/alpineLinux/edge/wayfire.ini"
+        curl -so $HOME/.config/wayfire.ini $url
+    fi
 
     if [ ! -d /usr/share/icons/windows-11-icons/ ]; then
         printf '%s\n' "❯ cloning Windows-11-icons"
@@ -1211,14 +1145,6 @@ EOF
 
     if grep -q kde /root/list; then
         mkdir -p /etc/sddm.conf.d/
-        if [ -f /etc/sddm.conf ]; then
-            cat > /etc/sddm.conf <<EOF
-[Autologin]
-User=$user
-[Theme]
-Current=breeze
-EOF
-        fi
         if [ ! -d $HOME/.config/kde.org/ ]; then
             printf '%s\n' "❯ cloning KDE settings"
             git clone https://github.com/0free/KDE-plasma.git $HOME/kde/
@@ -1229,41 +1155,20 @@ EOF
         fi
     fi
 
-    if [ -f /usr/bin/kwalletd5 ]; then
-        mkdir -p $HOME/.local/share/dbus-1/services/
-        cat > $HOME/.local/share/dbus-1/services/org.freedesktop.secrets.service <<EOF
-[D-BUS Service]
-Name=org.freedesktop.secrets
-Exec=/usr/bin/kwalletd5
+    if [ -f /etc/sddm.conf ]; then
+        cat > /etc/sddm.conf <<EOF
+[Autologin]
+User=$user
+[Theme]
+Current=breeze
 EOF
     fi
 
-    printf '%s\n' "❯ setting ~/"
-    chown -R $user:wheel $HOME/
-    chown -R $user:wheel $HOME/.config/
-    chmod -R 700 $HOME/
-    chmod -R 700 $HOME/.config/
-
-}
-
-configure_startup() {
-
-    if [ -f /usr/bin/gnome-session ]; then
-        run_session='/usr/bin/gnome-session'
-    fi
-    if [ -f /usr/bin/startplasma-wayland ]; then
-        run_session='/usr/bin/startplasma-wayland'
-    fi
-    if [ -f /usr/bin/startxfce4 ]; then
-        run_session='/usr/bin/startxfce4'
-    fi
-    if [ -f /usr/bin/papershell ]; then
-        run_session='/usr/bin/papershell'
-    fi
-    if [ -f /usr/bin/wayfire ]; then
-        run_session='/usr/bin/wayfire'
+    if [ -f /usr/bin/lightdm ]; then
+        configure_lightdm
     fi
 
+    printf '%s\n' "❯ adding session start"
     cat > /etc/local.d/session.start <<EOF
 [ \$DISPLAY = '' ] && export DISPLAY=:0
 [ \$WAYLAND_DISPLAY = '' ] && export WAYLAND_DISPLAY=wayland-0
@@ -1275,13 +1180,17 @@ EOF
 
     chmod 0755 /etc/local.d/session.start
 
-}
+    printf '%s\n' "❯ wayland environment"
+    cat > /etc/environment <<EOF
+XDG_SESSION_TYPE=wayland
+GDK_BACKEND=wayland
+QT_QPA_PLATFORM=wayland-egl
+QT_WAYLAND_FORCE_DPI=physical
+QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+MOZ_ENABLE_WAYLAND=1
+EOF
 
-configure_wayfire() {
-
-    printf '%s\n' "❯ downloading wayfire ini"
-    url="https://raw.githubusercontent.com/0free/alpineLinux/edge/wayfire.ini"
-    curl -so $HOME/.config/wayfire.ini $url
+    printf '%s' '8' > /root/chroot
 
 }
 
@@ -1302,60 +1211,31 @@ configure_lightdm() {
 
 }
 
-configure_greetd() {
+add_scripts() {
 
-    printf '%s\n' "❯ configuring greetd"
-
-    if grep -q PaperDE /root/list; then
-        command='/usr/bin/wayfire -c /usr/share/paperde/wayfire.ini'
+    if ! grep -q virtual /root/list; then
+        build_zfs
+        install_nvidia
     fi
 
-    if grep -q wayfire /root/list; then
-        cp /usr/share/wayfire/wayfire.ini.default $HOME/.config/wayfire.ini
-        command='/usr/bin/wayfire -c /etc/wayfire.ini'
-        cat > /etc/wayfire.ini <<EOF
-[autostart]
-autostart_wf_shell=true
-gtkgreet=/usr/bin/regreet
-[core]
-plugins=autostart
-vheight=1
-vwidth=1
-xwayland=true
-EOF
+    custom_kernel
+    google_chrome
+    install_lutris
+
+    if grep -q server /root/list; then
+        setup_mariadb
+        install_webserver
+    elif grep -q miner /root/list; then
+        install_miner
+    else
+        create_iso
+        install_office
+        openwrt
     fi
 
-    cat > /etc/greetd/config.toml <<EOF
-[terminal]
-vt=1
-[default_session]
-command="$command"
-user=$user
-EOF
+    printf '%s' '9' > /root/chroot
 
-    cat > /etc/greetd/regreet.toml <<EOF
-[background]
-path = "/usr/share/backgrounds/greeter.jpg"
-fit = "Contain"
-[env]
-ENV_VARIABLE = ""
-[GTK]
-application_prefer_dark_theme = true
-cursor_theme_name = "Adwaita"
-font_name = "Cantarell 16"
-icon_theme_name = "Adwaita"
-theme_name = "Adwaita"
-[commands]
-reboot = [ "systemctl", "reboot" ]
-poweroff = [ "systemctl", "poweroff" ]
-login = [ "loginctl", "login" ]
-EOF
-
-    url='https://raw.githubusercontent.com/scotabroad/nix-configuration/main/theme/rose-pine/base/wayland/regreet.css'
-    curl -so /etc/greetd/regreet.css $url
-
-    regreet --config /etc/greetd/regreet.toml
-    regreet --style /etc/greetd/regreet.css
+    setup_bootloader
 
 }
 
@@ -1599,6 +1479,8 @@ make_initramfs() {
         mkinitfs -b / -c /etc/mkinitfs/mkinitfs.conf -f /etc/fstab -o /boot/initramfs-$(printf '%s' $k | sed 's|.*-||') $k
     done
 
+    printf '%s' '10' > /root/chroot
+
 }
 
 setup_bootloader() {
@@ -1635,8 +1517,7 @@ setup_bootloader() {
         install_clover
     fi
 
-    custom_commands
-    finish
+    printf '%s' '11' > /root/chroot
 
 }
 
@@ -1647,7 +1528,7 @@ find_windows() {
         if [ ! -d $d ]; then
             if printf '%s' $d | grep -Eq '/dev/nvme[0-9]n[1-9]p1$|/dev/sd[a-z]1$'; then
                 p=$d
-                if [ "$p" != "$bootDrive" ]; then
+                if [ "$p" -ne "$bootDrive" ]; then
                     mkdir -p /windows/
                     mount -r $p /windows/
                     if [ -f /windows/EFI/Microsoft/Boot/BCD ]; then
@@ -1744,7 +1625,7 @@ install_gummiboot() {
     printf '%s\n' "❯ adding entries to gummiboot"
     mkdir -p /boot/loader/entries/
 
-    if [ "$windowsDrive" != '' ]; then
+    if [ "$windowsDrive" -ne '' ]; then
         cat > /boot/loader/entries/windows.conf <<EOF
 title Windows
 efi /EFI/Microsoft/Boot/BOOTMGFW.EFI
@@ -1992,7 +1873,7 @@ install_refind() {
     curl -Lo /boot/rEFInd/drivers_x64/zfs_x64.efi https://github.com/pbatard/efifs/releases/download/$version/zfs_x64.efi
 
     printf '%s\n' "❯ configuring rEFInd bootloader"
-    if [ "$windowsDrive" != '' ]; then
+    if [ "$windowsDrive" -ne '' ]; then
         uuid=$(blkid $windowsBoot -o export | grep ^UUID= | sed 's|UUID=||')
         cat >> /boot/rEFInd/refind.conf <<EOF
 menuentry "Windows Boot Manager" {
@@ -2221,19 +2102,49 @@ EOF
 }
 EOF
 
+    printf '%s' '12' > /root/chroot
+
 }
 
 finish() {
 
     printf '%s\n' "❯ fixing /etc/profile.d/*.sh"
     sed -i 's|\r||g' /etc/profile.d/*.sh
+
     printf '%s\n' "❯ cleaning packages"
     apk del '*-doc'
+
     printf '%s\n' "❯ cleaning files"
     rm -rf /var/tmp/*
     find / ! -prune -type f -iname 'readme' -o -iname 'readme.txt' -o -iname '*.md' -o -iname 'license' -o -iname 'license.txt' -o -iname '*.license' -o -iname '*.docbook' -o -iname 'authors' -o -iname 'copying' -exec rm {} \;
+
     printf '%s\n' "❯ installation is completed"
-    mv /root/list /reboot
+    printf '%s' 'reboot' > /root/chroot
+
+}
+
+reboot() {
+
+    printf '%s\n' "❯ un-mounting /mnt/*"
+    for d in /mnt/run /mnt/sys /mnt/dev /mnt/proc /mnt/boot; do
+        if df -Thx tmpfs | grep -q $d; then
+            umount $d
+        fi
+    done
+
+    printf '%s\n' "❯ cleaning /root/"
+    rm -rf /mnt/root/*
+
+    printf '%s\n' "❯ un-mounting /mnt"
+    umount -R /mnt
+
+    if df -Thx tempfs | grep -q zfs; then
+        printf '%s\n' "❯ exporting ZFS pool"
+        zpool export -a
+    fi
+
+    printf '%s\n' '--> press ENTER to reboot'
+    printf '%s\n' '' | reboot -f || exit
 
 }
 
@@ -2243,66 +2154,55 @@ if [ -f /mnt/lib/apk/db/lock ]; then
     rm /mnt/lib/apk/db/lock
 fi
 
-if [ -f /mnt/reboot ]; then
-    printf '%s\n' "❯ un-mounting /mnt/*"
-    for d in /mnt/sys /mnt/dev /mnt/proc /mnt/boot; do
-        if df -Thx tmpfs | grep -q $d; then
-            umount $d
-        fi
-    done
-    printf '%s\n' "❯ cleaning /root/"
-    rm -rf /mnt/root/*
-    printf '%s\n' "❯ un-mounting /mnt"
-    umount -R /mnt
-    if df -Thx tempfs | grep -q zfs; then
-        printf '%s\n' "❯ exporting ZFS pool"
-        zpool export -a
-    fi
-    printf '%s\n' '--> press ENTER to reboot'
-    printf '%s\n' '' | reboot -f || exit
-elif [ -f /mnt/root/chroot ]; then
+if [ -f /root/list ]; then
+    drive=$(. /root/list; printf '%s' $drive)
+    filesystem=$(. /root/list; printf '%s' $filesystem)
+    bootDrive=$(. /root/list; printf '%s' $bootDrive)
+    swapDrive=$(. /root/list; printf '%s' $swapDrive)
+    rootDrive=$(. /root/list; printf '%s' $rootDrive)
+    bootloader=$(. /root/list; printf '%s' $bootloader)
+    windowsDrive=$(. /root/list; printf '%s' $windowsDrive)
+    windowsBoot=$(. /root/list; printf '%s' $windowsBoot)
+    user=$(. /root/list; printf '%s' $user)
+    password=$(. /root/list; printf '%s' $password)
+    HOME="/home/$user"
+fi
+
+if [ -f /mnt/root/chroot ]; then
     change_root
 else
-    if [ -f /root/list ]; then
-        drive=$(. /root/list; printf '%s' $drive)
-        filesystem=$(. /root/list; printf '%s' $filesystem)
-        bootDrive=$(. /root/list; printf '%s' $bootDrive)
-        swapDrive=$(. /root/list; printf '%s' $swapDrive)
-        rootDrive=$(. /root/list; printf '%s' $rootDrive)
-        windowsDrive=$(. /root/list; printf '%s' $windowsDrive)
-        windowsBoot=$(. /root/list; printf '%s' $windowsBoot)
-        user=$(. /root/list; printf '%s' $user)
-        password=$(. /root/list; printf '%s' $password)
-        hostname=$(. /root/list; printf '%s' $hostname)
-    fi
     if [ -f /root/chroot ]; then
-        if [ $param != '' ]; then
-            setup_bootloader
-        elif find /home -maxdepth 1 -type d | wc -l | grep -qv '1'; then
-            user=$(ls /home/)
-            HOME="/home/$user"
-            if [ -d $HOME/.config/autostart/ ]; then
-                setup_desktop
-            else
-                configure
-            fi
-        else
-            configure
-        fi
+        while true; do
+            step=$(cat /root/chroot)
+            case $step in
+                '0') set_fstab;;
+                '1') install_linux;;
+                '2') install_packages;;
+                '3') disable_root;;
+                '4') create_user;;
+                '5') enable_services;;
+                '6') configure_alpine;;
+                '7') setup_desktop;;
+                '8') add_scripts;;
+                '9') make_initramfs;;
+                '10') setup_bootloader;;
+                '11') custom_commands;;
+                '12') finish;;
+                'reboot') reboot;;
+            esac
+        done
     else
         if df -Th | grep -v tmpfs | grep -q /mnt; then
             if ! df -Th | grep -v tmpfs | grep -q /mnt/boot; then
                 mount_boot
             fi
-            if [ -d /mnt/root/ ]; then
-                setup_linux
-            else
-                install_base
-            fi
+            install_base
+            change_root
         else
             clear
             init_drive
-            setup_user
+            init_system
+            init_user
             setup_drive
         fi
     fi
