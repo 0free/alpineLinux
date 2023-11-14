@@ -33,25 +33,24 @@ kernel() {
         url="$makefile"
         curl -so ~/Makefile $url
         get_kernel_version ~/Makefile
-        set -- "build linux-$kernel"
+        set -- "build linux-$kernel Torvalds"
 
         makefile='https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/Makefile'
-
-        printf '%s\n' '❯ getting linux kernel stable release'
-        url="$makefile?h=linux-$version.$patchLevel.y"
-        if ! curl -so /dev/null $url; then
-            patchLevel=$((patchLevel-1))
-            url="$makefile?h=linux-$version.$patchLevel.y"
-        fi
-        curl -so ~/Makefile $url
-        get_kernel_version ~/Makefile
-        set -- "$@" "build linux-$kernel stable"
 
         printf '%s\n' '❯ getting linux kernel mainline release'
         url="$makefile"
         curl -so ~/Makefile $url
         get_kernel_version ~/Makefile
         set -- "$@" "build linux-$kernel mainline"
+
+        printf '%s\n' '❯ getting linux kernel stable release'
+        if printf $kernel | grep -q '\-rc'; then
+            patchLevel=$((patchLevel-1))
+        fi
+        url="$makefile?h=linux-$version.$patchLevel.y"
+        curl -so ~/Makefile $url
+        get_kernel_version ~/Makefile
+        set -- "$@" "build linux-$kernel stable"
 
         printf '%s\n' '❯ getting linux kernel rolling release'
         url="$makefile?h=linux-rolling-stable"
