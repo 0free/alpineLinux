@@ -191,7 +191,7 @@ packages_list() {
     if ! grep -q 'no-desktop' /root/list; then
         packages="$packages
         #wine
-        wine wine-mono
+        wine-staging wine-mono
         #razer
         openrazer-driver-dkms razergenie
         #printer

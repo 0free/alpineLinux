@@ -1,24 +1,24 @@
 #!/bin/ash
 
-HOSTNAME="$1"
+HOSTNAME=$1
 
 cleanup() {
     rm -rf $tmp
 }
 
 makefile() {
-    cat > "$3"
-    chown "$1" "$3"
-    chmod "$2" "$3"
+    cat > $3
+    chown $1 $3
+    chmod $2 $3
 }
 
 services() {
-    runlevel="$1"
+    runlevel=$1
     mkdir -p $tmp/etc/runlevels/$runlevel/
     shift 2
-    for i in "$@"; do
-        if [ -f /etc/init.d/"$i" ]; then
-            ln -sf /etc/init.d/"$i" "$tmp/etc/runlevels/$runlevel/$i"
+    for i in $@; do
+        if [ -f /etc/init.d/$i ]; then
+            ln -sf /etc/init.d/$i $tmp/etc/runlevels/$runlevel/$i
         fi
     done
 }
@@ -103,10 +103,10 @@ EOF
 if [ $desktop = 'gnome' ]; then
 
     session='/usr/share/wayland-sessions/gnome-wayland.desktop'
-    terminal='kgx'
+    terminal='/usr/bin/kgx'
 
     mkdir -p $tmp/etc/gdm/
-    makefile root:root 0644 $tmp/etc/gdm/custom.conf <<EOF
+    makefile root:root 0644 $tmp/etc/gdm/login.conf <<EOF
 [daemon]
 WaylandEnable=true
 AutomaticLoginEnable=true
