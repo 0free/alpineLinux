@@ -134,9 +134,10 @@ kernel() {
             cd ~/linux-$kernel/ && doas make -j$(nproc) ARCH=x86_64 modules_install
             cd ~
 
-            printf '%s\n' "❯ deleting shortcuts"
+            printf '%s\n' "❯ shortcuts"
             doas rm -rf /lib/modules/$kernelVersion/build
             doas rm -rf /lib/modules/$kernelVersion/source
+            doas ln -sf /lib/modules/$kernelVersion/build /usr/src/linux-headers-$kernel
 
             printf '%s\n' "❯ adding linux-headers shortcuts"
             doas ln -sf /usr/src/linux-headers-$kernel /lib/modules/$kernelVersion/build
