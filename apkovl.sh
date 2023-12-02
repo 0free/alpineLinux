@@ -102,8 +102,15 @@ EOF
 
 if [ $desktop = 'gnome' ]; then
 
-    session='/usr/share/wayland-sessions/gnome-wayland.desktop'
-    terminal='/usr/bin/kgx'
+    session_dbus  = '/usr/bin/dbus-run-session'
+    session_gnome = '/usr/bin/gnome-session'
+    session = '/usr/share/wayland-sessions/gnome-wayland.desktop'
+    terminal = '/usr/bin/kgx'
+
+    mkdir -p $tmp/etc/local.d/
+    makefile root:root 0644 $tmp/etc/local.d/session.start <<EOF
+$session_dbus $session_run
+EOF
 
     mkdir -p $tmp/etc/gdm/
     makefile root:root 0644 $tmp/etc/gdm/login.conf <<EOF
@@ -130,7 +137,7 @@ services sysinit devfs dmesg mdev hwdrivers modloop udev udev-trigger udev-settl
 
 services boot procfs devfs sysfs root modules ntpd hwclock swclock sysctl hostname bootmisc syslog dbus networking efivars cgroups zcommon znvpair spl zavl zlua zunicode zzstd icp zfs
 
-services default acpid crond iwd networkmanager networkmanager-dispatcher alsa bluez bluealsa bluetooth openrc-settingsd elogind polkit local gdm
+services default acpid crond iwd networkmanager networkmanager-dispatcher alsa bluez bluealsa bluetooth openrc-settingsd elogind polkit local
 
 services shutdown mount-ro killprocs savecache
 
