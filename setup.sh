@@ -409,13 +409,7 @@ packages_list() {
         packages="$packages
         #php
         phpmyadmin composer
-        php83 php83-bcmath php83-brotli php83-bz2 php83-cgi
-        php83-curl php83-common php83-phpdbg php83-dom php83-exif
-        php83-fileinfo php83-fpm php83-gd php83-gettext php83-iconv
-        php83-intl php83-litespeed php83-mbstring php83-mysqli
-        php83-mysqlnd php83-opcache php83-openssl
-        php83-pecl-apcu php83-phar php83-pear
-        php83-session php83-snmp php83-soap php83-xml php83-zip
+        php83-apache2 php83-bcmath php83-bz2 php83-calendar php83-cgi php83-common php83-ctype php83-curl php83-dba php83-dbg php83-dev php83-doc php83-dom php83-embed php83-enchant php83-exif php83-ffi php83-fileinfo php83-fpm php83-ftp php83-gd php83-gettext php83-gmp php83-iconv php83-imap php83-intl php83-ldap php83-litespeed php83-mbstring php83-mysqli php83-mysqlnd php83-odbc php83-opcache php83-openssl php83-pcntl php83-pdo php83-pdo_dblib php83-pdo_mysql php83-pdo_odbc php83-pdo_pgsql php83-pdo_sqlite php83-pear php83-pgsql php83-phar php83-phpdbg php83-posix php83-pspell php83-session php83-shmop php83-simplexml php83-snmp php83-soap php83-sockets php83-sodium php83-sqlite3 php83-sysvmsg php83-sysvsem php83-sysvshm php83-tidy php83-tokenizer php83-xml php83-xmlreader php83-xmlwriter php83-xsl php83-zip
         "
     fi
 
