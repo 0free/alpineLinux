@@ -131,16 +131,13 @@ kernel() {
             doas rm -rf /lib/modules/linux-$kernelVersion/
 
             printf '%s\n' "❯ installing linux-$kernel modules"
-            cd ~/linux-$kernel/ && doas make -j$(nproc) ARCH=x86_64 modules_install
+            cd ~/linux-$kernel/
+            doas make -j$(nproc) ARCH=x86_64 modules_install
             cd ~
 
             printf '%s\n' "❯ shortcuts"
             doas rm -rf /lib/modules/$kernelVersion/build
             doas rm -rf /lib/modules/$kernelVersion/source
-            doas ln -sf /lib/modules/$kernelVersion/build /usr/src/linux-headers-$kernel
-
-            printf '%s\n' "❯ adding linux-headers shortcuts"
-            doas ln -sf /usr/src/linux-headers-$kernel /lib/modules/$kernelVersion/build
 
             printf '%s\n' "❯ copying vmlinuz image"
             doas cp ~/linux-$kernel/.config /boot/config-$kernelVersion
@@ -152,7 +149,8 @@ kernel() {
 
             printf '%s\n' "❯ installing linux-$kernel-headers"
             doas rm -rf /usr/src/linux-headers-$kernel/
-            cd ~/linux-$kernel/ && doas make headers_install ARCH=x86_64 INSTALL_HDR_PATH=/usr/src/linux-headers-$kernel
+            cd ~/linux-$kernel/
+            doas make headers_install ARCH=x86_64 INSTALL_HDR_PATH=/usr/src/linux-headers-$kernel
 
             printf '%s\n' "❯ deleting linux-$kernel src"
             #doas rm -r ~/linux-$kernel/
