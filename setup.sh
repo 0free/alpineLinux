@@ -879,9 +879,9 @@ EOF
 change_root() {
 
     if ! grep -q 'step=' $f; then
+        printf '\n%s' 'step=0' >> $f
         printf '%s\n' "❯ copying $f"
         cp $f /mnt/
-        printf '\n%s' 'step=0' >> /mnt$f
     fi
 
     printf '%s\n' "❯ copying install script"
