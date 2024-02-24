@@ -474,7 +474,6 @@ menu() {
 }
 
 init_drive() {
-init_drive() {
 
     printf '%s\n' '❯ created by Saif AlSubhi'
     for i in $(seq 1 100); do printf -- '-%.0s' $i; done
