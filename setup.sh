@@ -1995,29 +1995,25 @@ unmount() {
 set -e
 
 if ! grep -q 'step=' $f; then
-
     if [ ! -f /usr/local/bin/setup ]; then
-
         printf '%s\n' "❯ downloading setup"
         url='https://raw.githubusercontent.com/0free/alpineLinux/edge/setup'
         curl -so /usr/local/bin/setup $url
         chmod 0755 /usr/local/bin/setup
-
     fi
-
 fi
 
 if [ -f /mnt/lib/apk/db/lock ]; then
     rm /mnt/lib/apk/db/lock
 fi
 
-if [ -f /mnt/$f ]; then
+if grep -q 'step=' /mnt/$f; then
 
     change_root
 
 else
 
-    if [ -f $f ]; then
+    if grep -q 'password=' $f; then
 
         drive=$(. $f; printf '%s' $drive)
         filesystem=$(. $f; printf '%s' $filesystem)
@@ -2031,55 +2027,47 @@ else
         password=$(. $f; printf '%s' $password)
         HOME="/home/$user"
 
-        if grep -q 'step=' list; then
+    fi
 
-            if [ "$(. $f; printf '%s' $step)" = 13 ]; then
-                unmount
-            fi
+    if grep -q 'step=' $f; then
 
-            if [ "$(. $f; printf '%s' $step)" = 14 ]; then
-                reboot
-            fi
+        while true; do
+            case $(. $f; printf '%s' $step) in
+                '0') set_fstab;;
+                '1') install_linux;;
+                '2') install_packages;;
+                '3') disable_root;;
+                '4') create_user;;
+                '5') enable_services;;
+                '6') configure_alpine;;
+                '7') setup_desktop;;
+                '8') add_scripts;;
+                '9') make_initramfs;;
+                '10') setup_bootloader;;
+                '11') custom_commands;;
+                '12') finish;;
+                *) break;;
+            esac
+        done
 
-            while true; do
-
-                case $(. $f; printf '%s' $step) in
-                    '0') set_fstab;;
-                    '1') install_linux;;
-                    '2') install_packages;;
-                    '3') disable_root;;
-                    '4') create_user;;
-                    '5') enable_services;;
-                    '6') configure_alpine;;
-                    '7') setup_desktop;;
-                    '8') add_scripts;;
-                    '9') make_initramfs;;
-                    '10') setup_bootloader;;
-                    '11') custom_commands;;
-                    '12') finish;;
-                    *) break;;
-                esac
-
-            done
-
-        else
-
-            if df -Th | grep -v tmpfs | grep -q /mnt; then
-
-                if ! df -Th | grep -v tmpfs | grep -q /mnt/boot; then
-                    mount_boot
-                fi
-
-                install_base
-                change_root
-
-            else
-
-                setup_drive
-
-            fi
-
+        if [ "$(. $f; printf '%s' $step)" = 13 ]; then
+            unmount
         fi
+
+        if [ "$(. $f; printf '%s' $step)" = 14 ]; then
+            reboot
+        fi
+
+    fi
+
+    if df -Th | grep -v tmpfs | grep -q /mnt; then
+
+        if ! df -Th | grep -v tmpfs | grep -q /mnt/boot; then
+            mount_boot
+        fi
+
+        install_base
+        change_root
 
     else
 
