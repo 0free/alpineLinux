@@ -2087,6 +2087,7 @@ else
         init_drive
         init_system
         init_user
+        setup_drive
         install_base
         change_root
 
