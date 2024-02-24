@@ -915,7 +915,7 @@ set_fstab() {
 
     printf '\n%s\n' "$entry" >> /etc/fstab
 
-    if grep -q 'recoveryDrive' $f; then
+    if grep -q 'recoveryDrive=' $f; then
 
         recoveryUUID=$(blkid $recoveryDrive -o export | grep ^UUID=)
 
@@ -925,7 +925,7 @@ set_fstab() {
 
     fi
 
-    if grep -q 'swapDrive' $f; then
+    if grep -q 'swapDrive=' $f; then
 
         swapUUID=$(blkid $swapDrive -o export | grep ^UUID=)
 
@@ -2007,11 +2007,17 @@ if [ -f /mnt/lib/apk/db/lock ]; then
     rm /mnt/lib/apk/db/lock
 fi
 
-if grep -q 'step=' /mnt$f; then
+if [ -f /mnt$f ]; then
 
-    change_root
+    if grep -q 'step=' /mnt$f; then
 
-else
+        change_root
+
+    fi
+
+fi
+
+if [ -f $f ]; then
 
     if grep -q 'password=' $f; then
 
@@ -2050,11 +2056,11 @@ else
             esac
         done
 
-        if [ "$(. $f; printf '%s' $step)" = 13 ]; then
+        if [ "$(. $f; printf '%s' $step)" = '13' ]; then
             unmount
         fi
 
-        if [ "$(. $f; printf '%s' $step)" = 14 ]; then
+        if [ "$(. $f; printf '%s' $step)" = '14' ]; then
             reboot
         fi
 
@@ -2069,7 +2075,9 @@ else
         install_base
         change_root
 
-    else
+    fi
+
+else
 
         clear
         init_drive
@@ -2078,8 +2086,6 @@ else
         setup_drive
         install_base
         change_root
-
-    fi
 
 fi
 
