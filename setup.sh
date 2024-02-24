@@ -2017,14 +2017,6 @@ if [ -f /mnt/$f ]; then
 
 else
 
-    if grep -q 'step=' $f; then
-
-        printf '%s\n' "❯ switching env"
-        env-update
-        source /etc/profile
-
-    fi
-
     if [ -f $f ]; then
 
         drive=$(. $f; printf '%s' $drive)
