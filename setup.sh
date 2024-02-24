@@ -1994,7 +1994,7 @@ unmount() {
 
 set -e
 
-if ! grep -q 'step=' $f; then
+if [ ! -f $f]; then
     if [ ! -f /usr/local/bin/setup ]; then
         printf '%s\n' "❯ downloading setup"
         url='https://raw.githubusercontent.com/0free/alpineLinux/edge/setup'
