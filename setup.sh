@@ -2007,7 +2007,7 @@ if [ -f /mnt/lib/apk/db/lock ]; then
     rm /mnt/lib/apk/db/lock
 fi
 
-if grep -q 'step=' /mnt/$f; then
+if grep -q 'step=' /mnt$f; then
 
     change_root
 
