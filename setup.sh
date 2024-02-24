@@ -2052,7 +2052,7 @@ if [ -f $f ]; then
                 '10') setup_bootloader;;
                 '11') custom_commands;;
                 '12') finish;;
-                *) break;;
+                '13') break;;
             esac
         done
 
