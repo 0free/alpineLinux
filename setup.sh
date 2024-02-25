@@ -1015,7 +1015,7 @@ create_user() {
     chmod 0400 /etc/doas.conf
     printf '%s\n' "❯ creating user"
     printf '%s\n%s\n' $password $password | adduser -h /home/$user -s /bin/ash -G wheel $user
-    usermod -aG input,audio,video,netdev,usb,disk $user
+    usermod -aG input,audio,video,netdev,disk $user
     mkdir -p /var/mail/$user/
     HOME="/home/$user"
     mkdir -p $HOME/.config/autostart/
