@@ -1988,8 +1988,6 @@ unmount() {
 
     sed -i 's|step=.*|step=14|' $f
 
-    exit
-
 }
 
 set -e
@@ -2052,12 +2050,13 @@ if [ -f $f ]; then
                 '10') setup_bootloader;;
                 '11') custom_commands;;
                 '12') finish;;
-                '13') break;;
+                *) break;;
             esac
         done
 
         if [ "$(. $f; printf '%s' $step)" = '13' ]; then
             unmount
+            exit
         fi
 
         if [ "$(. $f; printf '%s' $step)" = '14' ]; then
