@@ -903,6 +903,10 @@ set_fstab() {
 
     printf '%s\n' "❯ setting fstab"
 
+    rootUUID="$(blkid $rootDrive -o export | grep ^UUID=)"
+
+    entry="$rootUUID / $filesystem rw,ssd,noatime,autodefrag 0 0"
+
     printf '\n%s\n' "$entry" > /etc/fstab
 
     bootUUID="$(blkid $bootDrive -o export | grep ^UUID=)"
@@ -1614,7 +1618,7 @@ setup_bootloader() {
         param="root=$(blkid $rootDrive -o export | grep ^UUID=)"
     fi
 
-    param="$param rootfstype=$filesystem rootflags=rw,ssd,noatime,autodefrag loglevel=3 mitigations=off apparmor=1 security=apparmor"
+    param="$param rootfstype=$filesystem rw loglevel=3 mitigations=off apparmor=1 security=apparmor"
 
     if [ -f /usr/libexec/fwupd/efi/fwupdx64.efi ]; then
         firmware_update
