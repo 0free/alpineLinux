@@ -905,13 +905,13 @@ set_fstab() {
 
     rootUUID="$(blkid $rootDrive -o export | grep ^UUID=)"
 
-    entry="$rootUUID / $filesystem rw,ssd,noatime,autodefrag,compression=lz4 0 0"
+    entry="$rootUUID / $filesystem defaults,rw,ssd,noatime,autodefrag,compression=lz4 0 0"
 
     printf '\n%s\n' "$entry" > /etc/fstab
 
     bootUUID="$(blkid $bootDrive -o export | grep ^UUID=)"
 
-    entry="$bootUUID /boot vfat rw,ssd,noatime,autodefrag 0 0"
+    entry="$bootUUID /boot vfat defaults,rw,ssd,noatime,autodefrag 0 0"
 
     printf '\n%s\n' "$entry" >> /etc/fstab
 
@@ -919,7 +919,7 @@ set_fstab() {
 
         recoveryUUID=$(blkid $recoveryDrive -o export | grep ^UUID=)
 
-        entry="$recoveryUUID /recovery $filesystem rw,ssd,noatime,autodefrag,compression=lz4 0 0"
+        entry="$recoveryUUID /recovery $filesystem defaults,rw,ssd,noatime,autodefrag,compression=lz4 0 0"
 
         printf '\n%s\n' "$entry" >> /etc/fstab
 
