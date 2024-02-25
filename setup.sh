@@ -631,7 +631,7 @@ format_drive() {
     if grep -q virtual $f; then
         bootSize='100MiB'
     else
-        bootSize='300MiB'
+        bootSize='512MiB'
     fi
 
     sgdisk -n 0:0:+$bootSize -c 0:EFI -t 0:EF00 $drive
