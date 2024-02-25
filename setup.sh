@@ -157,7 +157,7 @@ packages_list() {
         plasma-settings plasma-systemmonitor plasma-browser-integration
         plasma-thunderbolt plasma-disks plasma-firewall
         #system
-        kwrited systemsettings ksysguard polkit-kde-agent-1
+        kwrited systemsettings polkit-kde-agent-1
         #theme
         breeze breeze-gtk breeze-icons5
         #bluetooth
