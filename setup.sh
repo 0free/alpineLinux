@@ -959,7 +959,7 @@ install_linux() {
             list="$list intel-ucode"
         fi
         #linux-tools
-        list="$list cpupower cpupower-openrc linux-tools-gpio linux-tools-iio linux-tools-spi perf bpftool linux-tools-tmon linux-tools-usbip linux-tools-usbip-openrc"
+        list="$list cpupower cpupower-openrc linux-tools-gpio linux-tools-iio linux-tools-spi perf linux-tools-tmon linux-tools-usbip linux-tools-usbip-openrc"
     fi
 
     if grep -q zfs $f; then
