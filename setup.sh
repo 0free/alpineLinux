@@ -1601,7 +1601,7 @@ make_initramfs() {
 
     for k in $(ls /lib/modules/ | grep [0-9]); do
         printf '%s\n' "❯ building linux $k initial ramdisk"
-        mkinitfs -b / -c /etc/mkinitfs/mkinitfs.conf -f /etc/fstab -o /boot/initramfs-$(printf '%s' $k | sed 's|.*-||') $k
+        mkinitfs -b / -c /etc/mkinitfs/mkinitfs.conf -o /boot/initramfs-$(printf '%s' $k | sed 's|.*-||') $k
     done
 
     sed -i 's|step=.*|step=10|' $f
