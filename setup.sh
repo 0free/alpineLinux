@@ -1010,9 +1010,11 @@ create_user() {
         printf '%s\n' "❯ deleting $user"
         userdel -r $user
     fi
+
     printf '%s\n' "❯ adding wheel to doas"
     sed -i 's|# permit persist :wheel|permit persist :wheel|' /etc/doas.conf
     chmod 0400 /etc/doas.conf
+
     printf '%s\n' "❯ creating user"
     printf '%s\n%s\n' $password $password | adduser -h /home/$user -s /bin/ash -G wheel $user
     usermod -aG input,audio,video,netdev,disk $user
@@ -1020,6 +1022,19 @@ create_user() {
     HOME="/home/$user"
     mkdir -p $HOME/.config/autostart/
     mkdir -p $HOME/.local/
+
+    printf '%s\n' "❯ changing config folder"
+    mkdir -p /$user/cache/
+    mkdir -p /$user/config/
+    mkdir -p /$user/data/
+    chown -R $user:wheel /$user/
+    chmod -R 755 /$user/
+
+    cat > /etc/profile.d/0user.sh <<EOF
+XDG_CACHE_HOME="${XDG_CACHE_HOME:=$user/cache}"
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:=/$user/config}"
+XDG_DATA_HOME="${XDG_DATA_HOME:=$user/data}"
+EOF
 
     sed -i 's|step=.*|step=5|' $f
 
