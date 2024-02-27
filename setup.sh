@@ -903,13 +903,13 @@ set_fstab() {
 
     printf '%s\n' "❯ setting fstab"
 
-    rootUUID="$(blkid $rootDrive -o export | grep ^UUID=)"
+    rootUUID="$(blkid $rootDrive -o export | grep '^UUID=')"
 
     entry="$rootUUID / $filesystem rw,ssd,noatime,autodefrag 0 0"
 
     printf '\n%s\n' "$entry" > /etc/fstab
 
-    bootUUID="$(blkid $bootDrive -o export | grep ^UUID=)"
+    bootUUID="$(blkid $bootDrive -o export | grep '^UUID=')"
 
     entry="$bootUUID /boot vfat rw,ssd,noatime,autodefrag 0 0"
 
@@ -917,7 +917,7 @@ set_fstab() {
 
     if grep -q 'recoveryDrive=' $f; then
 
-        recoveryUUID=$(blkid $recoveryDrive -o export | grep ^UUID=)
+        recoveryUUID="$(blkid $recoveryDrive -o export | grep '^UUID=')"
 
         entry="$recoveryUUID /recovery $filesystem rw,ssd,noatime,autodefrag 0 0"
 
@@ -927,7 +927,7 @@ set_fstab() {
 
     if grep -q 'swapDrive=' $f; then
 
-        swapUUID=$(blkid $swapDrive -o export | grep ^UUID=)
+        swapUUID="$(blkid $swapDrive -o export | grep '^UUID=')"
 
         entry="$swapUUID none swap sw 0 0"
 
@@ -1630,7 +1630,7 @@ setup_bootloader() {
     if grep -q zfs $f; then
         param="root=$ZFSpool"
     else
-        param="root=$(blkid $rootDrive -o export | grep ^UUID=)"
+        param="root=$(blkid $rootDrive -o export | grep '^UUID=')"
     fi
 
     param="$param rootfstype=$filesystem rw loglevel=3 mitigations=off apparmor=1 security=apparmor"
@@ -1757,7 +1757,7 @@ install_gummiboot() {
         cat > /boot/loader/entries/windows.conf <<EOF
 title Windows
 efi /EFI/Microsoft/Boot/BOOTMGFW.EFI
-options "root=$(blkid $windowsBoot -o export | grep ^UUID=)"
+options "root=$(blkid $windowsBoot -o export | grep '^UUID=')"
 EOF
     fi
 
