@@ -881,7 +881,7 @@ change_root() {
     if ! grep -q 'step=' $f; then
         printf '\n%s' 'step=0' >> $f
         printf '%s\n' "❯ copying $f"
-        cp $f /mnt
+        cp $f /mnt/root/
     fi
 
     printf '%s\n' "❯ copying install script"
