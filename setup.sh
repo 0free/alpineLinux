@@ -195,7 +195,7 @@ packages_list() {
     if ! grep -Eq "no-desktop|virtual|server" $f; then
         packages="$packages
         #wine
-        wine wine-mono
+        wine-staging
         #razer
         razergenie razergenie openrazer
         razercfg razercfg-gui razercfg-openrc
