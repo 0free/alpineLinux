@@ -164,8 +164,6 @@ packages_list() {
         bluedevil
         #power
         powerdevil
-        #wayland
-        kwayland-integration
         #network
         plasma-nm
         #firewall
