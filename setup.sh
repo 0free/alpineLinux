@@ -174,7 +174,7 @@ packages_list() {
         plasma-pa kpipewire kmix
         #kde
         kdialog kscreen kmenuedit konsole
-        kde-gtk-config khotkeys xdg-desktop-portal-kde
+        kde-gtk-config xdg-desktop-portal-kde
         #file-manager
         dolphin dolphin-plugins kfind
         #text
