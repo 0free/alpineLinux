@@ -903,13 +903,13 @@ set_fstab() {
 
     rootUUID="$(blkid $rootDrive -o export | grep '^UUID=')"
 
-    entry="$rootUUID / $filesystem rw,ssd,noatime,autodefrag 0 0"
+    entry="$rootUUID / $filesystem rw,ssd,noatime,autodefrag 0 1"
 
     printf '\n%s\n' "$entry" > /etc/fstab
 
     bootUUID="$(blkid $bootDrive -o export | grep '^UUID=')"
 
-    entry="$bootUUID /boot vfat rw,ssd,noatime,autodefrag 0 0"
+    entry="$bootUUID /boot vfat rw,ssd,noatime,autodefrag 0 2"
 
     printf '\n%s\n' "$entry" >> /etc/fstab
 
@@ -917,7 +917,7 @@ set_fstab() {
 
         recoveryUUID="$(blkid $recoveryDrive -o export | grep '^UUID=')"
 
-        entry="$recoveryUUID /recovery $filesystem rw,ssd,noatime,autodefrag 0 0"
+        entry="$recoveryUUID /recovery $filesystem rw,ssd,noatime,autodefrag 0 3"
 
         printf '\n%s\n' "$entry" >> /etc/fstab
 
@@ -932,6 +932,9 @@ set_fstab() {
         printf '\n%s\n' "$entry" >> /etc/fstab
 
     fi
+
+    entry="binfmt_misc /proc/sys/fs/binfmt_misc binfmt_misc 0 4"
+    printf '\n%s\n' "$entry" >> /etc/fstab
 
     sed -i 's|step=.*|step=1|' $f
 
