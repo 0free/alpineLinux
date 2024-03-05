@@ -80,8 +80,6 @@ packages_list() {
         kexec-tools
         #process
         psmisc
-        #apparmor
-        apparmor apparmor-openrc apparmor-utils apparmor-pam
         "
 
     if grep -q btrfs $f; then
@@ -1070,8 +1068,6 @@ enable_services() {
     #zfs
     add_service sysinit 'zfs-import zfs-mount'
     add_service boot 'zfs-share zfs-zed zfs-load-key'
-    #apparmor
-    add_service boot 'apparmor'
     #seatd
     add_service boot 'seatd'
     #dbus
@@ -1632,7 +1628,7 @@ setup_bootloader() {
         param="root=$(blkid $rootDrive -o export | grep '^UUID=')"
     fi
 
-    param="$param rootfstype=$filesystem rw loglevel=3 mitigations=off apparmor=1 security=apparmor"
+    param="$param rootfstype=$filesystem rw loglevel=3 mitigations=off"
 
     if [ -f /usr/libexec/fwupd/efi/fwupdx64.efi ]; then
         firmware_update
