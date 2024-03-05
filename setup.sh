@@ -966,6 +966,7 @@ install_linux() {
     printf '%s\n' "❯ installing linux"
     apk update
     apk fix
+    apk add linux-firmware-none
     apk add $list
 
     sed -i 's|step=.*|step=2|' $f
