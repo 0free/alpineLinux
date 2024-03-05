@@ -637,20 +637,19 @@ format_drive() {
     i=1
 
     bootDrive=$(find $drive* | grep -E "$drive[$i]|$drive[p][$i]")
+    printf '%s\n' "bootDrive=$bootDrive" >> $f
 
     printf '%s\n' "❯ creating boot filesystem"
     printf '%s\n' 'Y' | mkfs.vfat -F 32 -n BOOT $bootDrive
-    sleep 1
-
-    printf '%s\n' "bootDrive=$bootDrive" >> $f
+    sleep 2
 
     if printf '%s' $recoverySize | grep -q 'GiB'; then
 
         printf '%s\n' "❯ creating recovery partition"
-        sgdisk -n 0:0:+ $recoverySize -c 0:RECOVERY -t 0:8300 $drive
+        sgdisk -n 0:0:+$recoverySize -c 0:RECOVERY -t 0:8300 $drive
         i=$((i+1))
         recoveryDrive=$(find $drive* | grep -E "$drive[$i]|$drive[p][$i]")
-        printf '%s\n' "recoveryDrive=$recoveryDrive" >> list
+        printf '%s\n' "recoveryDrive=$recoveryDrive" >> $f
         printf '%s\n' "❯ creating recovery filesystem"
         printf '%s\n' 'Y' | mkfs.ext4 -L RECOVERY $recoveryDrive
 
@@ -662,9 +661,9 @@ format_drive() {
         sgdisk -n 0:0:+$swapSize -c 0:SWAP -t 0:8200 $drive
         i=$((i+1))
         swapDrive=$(find $drive* | grep -E "$drive[$i]|$drive[p][$i]")
+        printf '%s\n' "swapDrive=$swapDrive" >> $f
         printf '%s\n' "❯ creating swap filesystem"
         mkswap $swapDrive
-        printf '%s\n' "swapDrive=$swapDrive" >> $f
     
     fi
 
@@ -679,7 +678,6 @@ format_drive() {
     i=$((i+1))
 
     rootDrive=$(find $drive* | grep -E "$drive[$i]|$drive[p][$i]")
-
     printf '%s\n' "rootDrive=$rootDrive" >> $f
 
     printf '%s\n' "❯ reading partitions"
