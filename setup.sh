@@ -897,13 +897,13 @@ set_fstab() {
 
     printf '%s\n' "❯ setting fstab"
 
-    rootUUID="$(blkid $rootDrive -o export | grep '^UUID=')"
+    #rootUUID="$(blkid $rootDrive -o export | grep '^UUID=')"
 
     entry="$rootUUID / $filesystem rw,noatime,compress=zstd:1,ssd,discard=async,space_cache,commit=120 0 0"
 
     printf '\n%s\n' "$entry" > /etc/fstab
 
-    bootUUID="$(blkid $bootDrive -o export | grep '^UUID=')"
+    #bootUUID="$(blkid $bootDrive -o export | grep '^UUID=')"
 
     entry="$bootUUID /boot vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro 0 2"
 
