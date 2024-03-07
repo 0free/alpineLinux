@@ -604,6 +604,7 @@ setup_drive() {
 
     if df -Th | grep -v tmpfs | grep -Eq "$rootDrive|$bootDrive"; then
         install_base
+        set_fstab
         change_root
     fi
 
@@ -870,29 +871,6 @@ EOF
 
 }
 
-change_root() {
-
-    if ! grep -q 'step=' $f; then
-        printf '\n%s' 'step=0' >> $f
-        printf '%s\n' "❯ copying $f"
-        cp $f /mnt/root/
-    fi
-
-    printf '%s\n' "❯ copying install script"
-    cp /root/setup.sh /mnt/root/
-
-    printf '%s\n' "❯ changing root"
-
-    mount --bind /dev /mnt/dev
-    mount --bind /sys /mnt/sys
-    mount --bind /proc /mnt/proc
-    mount --bind /run /mnt/run
-    mount --bind /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars
-
-    chroot /mnt /bin/ash /root/setup.sh
-
-}
-
 set_fstab() {
 
     printf '%s\n' "❯ setting fstab"
@@ -936,7 +914,28 @@ set_fstab() {
     entry="binfmt_misc /proc/sys/fs/binfmt_misc binfmt_misc 0 4"
     printf '\n%s\n' "$entry" >> /etc/fstab
 
-    sed -i 's|step=.*|step=1|' $f
+}
+
+change_root() {
+
+    if ! grep -q 'step=' $f; then
+        printf '\n%s' 'step=1' >> $f
+        printf '%s\n' "❯ copying $f"
+        cp $f /mnt/root/
+    fi
+
+    printf '%s\n' "❯ copying install script"
+    cp /root/setup.sh /mnt/root/
+
+    printf '%s\n' "❯ changing root"
+
+    mount --bind /dev /mnt/dev
+    mount --bind /sys /mnt/sys
+    mount --bind /proc /mnt/proc
+    mount --bind /run /mnt/run
+    mount --bind /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars
+
+    chroot /mnt /bin/ash /root/setup.sh
 
 }
 
@@ -2054,7 +2053,6 @@ if [ -f $f ]; then
 
         while true; do
             case $(. $f; printf '%s' $step) in
-                '0') set_fstab;;
                 '1') install_linux;;
                 '2') install_packages;;
                 '3') disable_root;;
@@ -2085,6 +2083,7 @@ if [ -f $f ]; then
         fi
 
         install_base
+        set_fstab
         change_root
 
     fi
@@ -2097,6 +2096,7 @@ else
         init_user
         setup_drive
         install_base
+        set_fstab
         change_root
 
 fi
