@@ -2066,8 +2066,6 @@ else
                     '11') custom_commands;;
                     '12') finish;;
                     '13') umount;;
-                    '14') break;;
-                    *) break;;
                 esac
             done
 
