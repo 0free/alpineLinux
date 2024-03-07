@@ -2029,75 +2029,78 @@ if [ -f /mnt$f ]; then
 
     fi
 
-fi
-
-if [ -f $f ]; then
-
-    if grep -q 'password=' $f; then
-
-        drive=$(. $f; printf '%s' $drive)
-        filesystem=$(. $f; printf '%s' $filesystem)
-        bootDrive=$(. $f; printf '%s' $bootDrive)
-        swapDrive=$(. $f; printf '%s' $swapDrive)
-        rootDrive=$(. $f; printf '%s' $rootDrive)
-        recoveryDrive="$(. $f; printf '%s' $recoveryDrive)"
-        windowsDrive=$(. $f; printf '%s' $windowsDrive)
-        windowsBoot=$(. $f; printf '%s' $windowsBoot)
-        user=$(. $f; printf '%s' $user)
-        password=$(. $f; printf '%s' $password)
-        HOME="/home/$user"
-
-    fi
-
-    if grep -q 'step=' $f; then
-
-        while true; do
-            case $(. $f; printf '%s' $step) in
-                '1') install_linux;;
-                '2') install_packages;;
-                '3') disable_root;;
-                '4') create_user;;
-                '5') enable_services;;
-                '6') configure_alpine;;
-                '7') setup_desktop;;
-                '8') add_scripts;;
-                '9') make_initramfs;;
-                '10') setup_bootloader;;
-                '11') custom_commands;;
-                '12') finish;;
-                '13') umount;;
-                *) break;;
-            esac
-        done
-
-        if [ "$(. $f; printf '%s' $step)" = '14' ]; then
-            reboot
-        fi
-
-    fi
-
-    if df -Th | grep -v tmpfs | grep -q /mnt; then
-
-        if ! df -Th | grep -v tmpfs | grep -q /mnt/boot; then
-            mount_boot
-        fi
-
-        install_base
-        set_fstab
-        change_root
-
-    fi
-
 else
 
-        clear
-        init_drive
-        init_system
-        init_user
-        setup_drive
-        install_base
-        set_fstab
-        change_root
+    if [ -f $f ]; then
+
+        if grep -q 'password=' $f; then
+
+            drive=$(. $f; printf '%s' $drive)
+            filesystem=$(. $f; printf '%s' $filesystem)
+            bootDrive=$(. $f; printf '%s' $bootDrive)
+            swapDrive=$(. $f; printf '%s' $swapDrive)
+            rootDrive=$(. $f; printf '%s' $rootDrive)
+            recoveryDrive="$(. $f; printf '%s' $recoveryDrive)"
+            windowsDrive=$(. $f; printf '%s' $windowsDrive)
+            windowsBoot=$(. $f; printf '%s' $windowsBoot)
+            user=$(. $f; printf '%s' $user)
+            password=$(. $f; printf '%s' $password)
+            HOME="/home/$user"
+
+        fi
+
+        if grep -q 'step=' $f; then
+
+            while true; do
+                case $(. $f; printf '%s' $step) in
+                    '1') install_linux;;
+                    '2') install_packages;;
+                    '3') disable_root;;
+                    '4') create_user;;
+                    '5') enable_services;;
+                    '6') configure_alpine;;
+                    '7') setup_desktop;;
+                    '8') add_scripts;;
+                    '9') make_initramfs;;
+                    '10') setup_bootloader;;
+                    '11') custom_commands;;
+                    '12') finish;;
+                    '13') umount;;
+                    '14') break;;
+                    *) break;;
+                esac
+            done
+
+            if [ "$(. $f; printf '%s' $step)" = '14' ]; then
+                reboot
+            fi
+
+        fi
+
+        if df -Th | grep -v tmpfs | grep -q /mnt; then
+
+            if ! df -Th | grep -v tmpfs | grep -q /mnt/boot; then
+                mount_boot
+            fi
+
+            install_base
+            set_fstab
+            change_root
+
+        fi
+
+    else
+
+            clear
+            init_drive
+            init_system
+            init_user
+            setup_drive
+            install_base
+            set_fstab
+            change_root
+
+    fi
 
 fi
 
