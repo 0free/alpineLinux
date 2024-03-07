@@ -2066,7 +2066,7 @@ if [ -f $f ]; then
                 '11') custom_commands;;
                 '12') finish;;
                 '13') umount;;
-                '*') break;;
+                *) break;;
             esac
         done
 
