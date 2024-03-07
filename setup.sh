@@ -2065,7 +2065,7 @@ else
                     '10') setup_bootloader;;
                     '11') custom_commands;;
                     '12') finish;;
-                    '13') umount;;
+                    '13') unmount;;
                 esac
             done
 
