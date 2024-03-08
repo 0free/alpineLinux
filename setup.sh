@@ -1632,7 +1632,7 @@ setup_bootloader() {
         param="root=$(blkid $rootDrive -o export | grep '^UUID=')"
     fi
 
-    param="$param rootfstype=$filesystem rw loglevel=3 mitigations=off"
+    param="$param rootfstype=$filesystem rw mitigations=off"
 
     if [ -f /usr/libexec/fwupd/efi/fwupdx64.efi ]; then
         firmware_update
