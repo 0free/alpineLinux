@@ -883,13 +883,13 @@ set_fstab() {
 
     entry="$rootUUID / $filesystem rw,noatime,compress=zstd:1,ssd,discard=async,space_cache,commit=120 0 0"
 
-    printf '\n%s\n' "$entry" > /etc/fstab
+    printf '\n%s\n' "$entry" > /mnt/etc/fstab
 
     bootUUID="$(blkid $bootDrive -o export | grep '^UUID=')"
 
     entry="$bootUUID /boot vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro 0 2"
 
-    printf '\n%s\n' "$entry" >> /etc/fstab
+    printf '\n%s\n' "$entry" >> /mnt/etc/fstab
 
     if grep -q 'recoveryDrive=' $f; then
 
@@ -897,7 +897,7 @@ set_fstab() {
 
         entry="$recoveryUUID /recovery $filesystem rw,noatime,compress=zstd:1,ssd,discard=async,space_cache,commit=120 0 3"
 
-        printf '\n%s\n' "$entry" >> /etc/fstab
+        printf '\n%s\n' "$entry" >> /mnt/etc/fstab
 
     fi
 
@@ -907,12 +907,12 @@ set_fstab() {
 
         entry="$swapUUID none swap sw 0 0"
 
-        printf '\n%s\n' "$entry" >> /etc/fstab
+        printf '\n%s\n' "$entry" >> /mnt/etc/fstab
 
     fi
 
     entry="binfmt_misc /proc/sys/fs/binfmt_misc binfmt_misc 0 4"
-    printf '\n%s\n' "$entry" >> /etc/fstab
+    printf '\n%s\n' "$entry" >> /mnt/etc/fstab
 
 }
 
