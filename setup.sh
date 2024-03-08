@@ -2024,9 +2024,7 @@ fi
 if [ -f /mnt$f ]; then
 
     if grep -q 'step=' /mnt$f; then
-
         change_root
-
     fi
 
 else
@@ -2034,7 +2032,6 @@ else
     if [ -f $f ]; then
 
         if grep -q 'password=' $f; then
-
             drive=$(. $f; printf '%s' $drive)
             filesystem=$(. $f; printf '%s' $filesystem)
             bootDrive=$(. $f; printf '%s' $bootDrive)
@@ -2046,11 +2043,9 @@ else
             user=$(. $f; printf '%s' $user)
             password=$(. $f; printf '%s' $password)
             HOME="/home/$user"
-
         fi
 
         if grep -q 'step=' $f; then
-
             while true; do
                 case $(. $f; printf '%s' $step) in
                     '1') install_linux;;
@@ -2066,13 +2061,9 @@ else
                     '11') custom_commands;;
                     '12') finish;;
                     '13') unmount;;
+                    '14') exec reboot;;
                 esac
             done
-
-            if [ "$(. $f; printf '%s' $step)" = '14' ]; then
-                reboot
-            fi
-
         fi
 
         if df -Th | grep -v tmpfs | grep -q /mnt; then
