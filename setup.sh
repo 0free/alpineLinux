@@ -49,6 +49,7 @@ packages_list() {
         xfsprogs hfsprogs exfatprogs f2fs-tools
         udftools sfdisk sgdisk mmc-utils jfsutils
         udisks2
+        ocfs2-tools
         #rsync
         rsync rsync-openrc
         #network
@@ -881,7 +882,7 @@ set_fstab() {
 
     rootUUID="$(blkid $rootDrive -o export | grep '^UUID=')"
 
-    entry="$rootUUID / $filesystem rw,noatime,compress=zstd:1,ssd,discard=async,space_cache,commit=120 0 0"
+    entry="$rootUUID / $filesystem rw,relatime,compress=zstd:1,ssd,discard=async,space_cache,commit=120 0 0"
 
     printf '\n%s\n' "$entry" > /mnt/etc/fstab
 
@@ -1755,6 +1756,7 @@ install_gummiboot() {
     if [ "$windowsDrive" -ne '' ]; then
         cat > /boot/loader/entries/windows.conf <<EOF
 title Windows
+architecture x64
 efi /EFI/Microsoft/Boot/BOOTMGFW.EFI
 options "root=$(blkid $windowsBoot -o export | grep '^UUID=')"
 EOF
@@ -1764,6 +1766,7 @@ EOF
         entry="/boot/loader/entries/linux-$i.conf"
         cat > $entry <<EOF
 title alpineLinux $i
+architecture x64
 linux /vmlinuz-$i
 initrd /initramfs-$i
 options $param
