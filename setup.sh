@@ -876,45 +876,37 @@ EOF
 
 set_fstab() {
 
-    printf '%s\n' "❯ setting fstab"
+    printf '%s\n' "❯ setting fstab"\
 
     if [ ! -f /sbin/blkid ]; then
         apk add blkid
     fi
 
     rootUUID="$(blkid $rootDrive -o export | grep '^UUID=')"
-
-    entry="$rootUUID / $filesystem rw,relatime,compress=zstd:1,ssd,discard=async,space_cache,commit=120 0 0"
-
+    entry="$rootUUID / $filesystem rw,relatime,compress=zstd:1,discard=async,space_cache,commit=64 0 0"
     printf '\n%s\n' "$entry" > /mnt/etc/fstab
 
     bootUUID="$(blkid $bootDrive -o export | grep '^UUID=')"
-
-    entry="$bootUUID /boot vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro 0 2"
-
+    entry="$bootUUID /boot vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro 0 0"
     printf '\n%s\n' "$entry" >> /mnt/etc/fstab
 
     if grep -q 'recoveryDrive=' $f; then
-
         recoveryUUID="$(blkid $recoveryDrive -o export | grep '^UUID=')"
-
-        entry="$recoveryUUID /recovery $filesystem rw,noatime,compress=zstd:1,ssd,discard=async,space_cache,commit=120 0 3"
-
+        entry="$recoveryUUID /recovery $filesystem rw,noatime,compress=zstd:1,discard=async,space_cache,commit=120 0 0"
         printf '\n%s\n' "$entry" >> /mnt/etc/fstab
-
     fi
 
     if grep -q 'swapDrive=' $f; then
-
         swapUUID="$(blkid $swapDrive -o export | grep '^UUID=')"
-
         entry="$swapUUID none swap sw 0 0"
-
         printf '\n%s\n' "$entry" >> /mnt/etc/fstab
 
     fi
 
-    entry="binfmt_misc /proc/sys/fs/binfmt_misc binfmt_misc 0 4"
+    entry="tmpfs /tmp tmpfs rw,nosuid,nodev,size=4G,mode=1777 0 0"
+    printf '\n%s\n' "$entry" >> /mnt/etc/fstab
+
+    entry="binfmt_misc /proc/sys/fs/binfmt_misc binfmt_misc 0 0"
     printf '\n%s\n' "$entry" >> /mnt/etc/fstab
 
 }
@@ -1066,10 +1058,9 @@ enable_services() {
     add_service shutdown 'mount-ro killprocs savecache'
     #busybox
     add_service sysinit 'mdev'
-    add_service boot 'syslog'
-    add_service default 'acpid crond'
+    add_service default 'acpid crond syslog'
     #rsyslog
-    add_service boot 'rsyslog'
+    add_service default 'rsyslog'
     #udev
     add_service sysinit 'udev udev-trigger udev-settle udev-postmount'
     #zfs
@@ -1078,8 +1069,7 @@ enable_services() {
     #seatd
     add_service boot 'seatd'
     #dbus
-    add_service boot 'dbus'
-    add_service default 'openrc-settingsd'
+    add_service default 'dbus openrc-settingsd'
     #logind
     add_service default 'elogind'
     #polkit
@@ -1103,8 +1093,8 @@ enable_services() {
     #login-manager
     add_service default 'gdm greetd lightdm sddm'
     #linux-tools
-    add_service default 'cpupower'
     add_service boot 'usbip'
+    add_service default 'cpupower'
     #printer
     add_service default 'cupsd'
     #database
