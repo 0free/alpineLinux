@@ -1202,6 +1202,10 @@ export LANG=\${LANG:-C.UTF-8}
 export LC_COLLATE=\${LC_COLLATE:-C}
 EOF
 
+    if ! grep -q binfmt_misc /etc/modules-load.d; then
+        printf '%s\n' binfmt_misc >> /etc/modules-load.d/binfmt.conf
+    fi
+
     if ! grep -q snd_seq /etc/modules; then
         printf '%s\n' snd_seq >> /etc/modules
     fi
