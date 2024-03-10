@@ -97,6 +97,8 @@ packages_list() {
         bolt pciutils
         #firmware
         fwupd fwupd-openrc fwupd-efi
+        #smartctl
+        smartmontools
         #mesa
         mesa
         mesa-dri-gallium mesa-va-gallium mesa-vdpau-gallium
@@ -1627,14 +1629,6 @@ setup_bootloader() {
 
     find_windows
 
-    if grep -q zfs $f; then
-        param="root=$ZFSpool"
-    else
-        param="root=$(blkid $rootDrive -o export | grep '^UUID=')"
-    fi
-
-    param="$param rootfstype=$filesystem rw mitigations=off"
-
     if [ -f /usr/libexec/fwupd/efi/fwupdx64.efi ]; then
         firmware_update
     fi
@@ -1744,11 +1738,17 @@ EOF
 
 install_gummiboot() {
 
+    if grep -q zfs $f; then
+        param="root=$ZFSpool"
+    else
+        param="root=$(blkid $rootDrive -o export | grep '^UUID=')"
+    fi
+
+    param="$param rootfstype=$filesystem rw mitigations=off"
+
     printf '%s\n' "❯ installing gummiboot"
     apk add gummiboot
     cp /usr/lib/gummiboot/gummibootx64.efi	/boot/efi/boot/bootx64.efi
-
-    efibootmgr -c -d $drive -p 1 -t 0 -L 'gummiboot' -l '\efi\boot\bootx64.efi'
 
     printf '%s\n' "❯ adding entries to gummiboot"
     mkdir -p /boot/loader/entries/
@@ -1822,6 +1822,9 @@ gummiboot() {
 }
 EOF
 
+    printf '%s\n' "❯ addding gummiboot to UEFI"
+    efibootmgr -c -d $drive -p 1 -t 0 -L 'alpineLinux' -l '\efi\boot\bootx64.efi' 
+
 }
 
 custom_commands() {
@@ -1872,14 +1875,6 @@ clean() {
     if [ ~/.*_history ]; then
         sort -u -o ~/.*_history ~/.*_history
     fi
-EOF
-
-    if grep -Eq 'grub|syslinux' $f; then
-        cat >> /etc/profile.d/commands.sh <<EOF
-}
-EOF
-    else
-        cat >> /etc/profile.d/commands.sh <<EOF
     doas apk del grub* syslinux* *-doc
 }
 EOF
