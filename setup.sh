@@ -876,7 +876,7 @@ EOF
 
 set_fstab() {
 
-    printf '%s\n' "❯ setting fstab"\
+    printf '%s\n' "❯ setting fstab"
 
     if [ ! -f /sbin/blkid ]; then
         apk add blkid
