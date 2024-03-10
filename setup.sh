@@ -1872,7 +1872,6 @@ clean() {
     doas apk del grub* syslinux* *-doc
 }
 EOF
-    fi
 
     if [ -f /usr/bin/yt-dlp ]; then
     cat >> /etc/profile.d/commands.sh <<EOF
