@@ -56,7 +56,7 @@ export color108='\[\e[108m\]'
 export color109='\[\e[109m\]'
 
 #terminal
-export PS1="\n$color100 \h $color107 \u $color105 $SHELL $color106 \w $textReset\n\n$color103$color94 ❯ $textReset "
+export PS1="\n$color102 \h $color104 \u $color105 $SHELL $color106 \w $textReset\n\n$color101$color92 ❯ $textReset "
 
 #bash-completion
 if [ -f /etc/bash/bash_completion.sh ]; then

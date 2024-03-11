@@ -1027,9 +1027,9 @@ create_user() {
     chown -R $user:wheel /$user/
     chmod -R 755 /$user/
 
-    cat > /etc/profile.d/0user.sh <<EOF
+    cat > /etc/profile.d/00user.sh <<EOF
 XDG_CACHE_HOME="${XDG_CACHE_HOME:=$user/cache}"
-XDG_CONFIG_HOME="${XDG_CONFIG_HOME:=/$user/config}"
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:=$user/config}"
 XDG_DATA_HOME="${XDG_DATA_HOME:=$user/data}"
 EOF
 
@@ -1185,12 +1185,6 @@ EOF
     printf '%s\n' "❯ setting locales"
     cat > /etc/locale.conf <<EOF
 LANG=en_US.UTF-8
-EOF
-
-    cat > /etc/profile.d/locale <<EOF
-export CHARSET=\${CHARSET:-UTF-8}
-export LANG=\${LANG:-C.UTF-8}
-export LC_COLLATE=\${LC_COLLATE:-C}
 EOF
 
     if ! grep -q binfmt_misc /etc/modules-load.d; then
