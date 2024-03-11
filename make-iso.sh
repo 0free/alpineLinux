@@ -12,7 +12,7 @@ for i in $@; do
    fi
 done
 
-if [ $list -ne '' ]; then
+if [ $list != '' ]; then
    doas apk add $list
 fi
 
