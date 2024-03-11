@@ -7,7 +7,7 @@ set -- alpine-conf alpine-sdk apk-tools build-base busybox dosfstools fakeroot g
 list=''
 
 for i in $@; do
-   if grep -q $i /etc/apk/world; then
+   if ! grep -q $i /etc/apk/world; then
       set -- $list $i
    fi
 done
