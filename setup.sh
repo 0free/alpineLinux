@@ -1843,10 +1843,6 @@ custom_commands() {
     curl -so /etc/profile.d/apk.sh $url
 
     cat > /etc/profile.d/commands.sh <<EOF
-export LC_ALL='C.UTF-8'
-if printf '%s' \$WAYLAND_DISPLAY | grep -q 'wayland-0'; then
-    export GTK_IM_MODULE=ibus
-fi
 search() {
     apk search
 }
