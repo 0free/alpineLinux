@@ -910,9 +910,6 @@ set_fstab() {
     entry="tmpfs /tmp tmpfs rw,nosuid,nodev,size=4G,mode=1777 0 0"
     printf '\n%s\n' "$entry" >> /mnt/etc/fstab
 
-    entry="binfmt_misc /proc/sys/fs/binfmt_misc binfmt_misc 0 0"
-    printf '\n%s\n' "$entry" >> /mnt/etc/fstab
-
 }
 
 change_root() {
