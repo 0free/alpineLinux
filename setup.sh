@@ -1853,7 +1853,7 @@ install() {
     doas apk add
 }
 remove() {
-    doas apk del
+    doas apk del --purge
 }
 disk() {
     lsblk -o name,type,mountpoints,size,fsused,fsuse%,uuid,model
@@ -1869,7 +1869,8 @@ clean() {
     if [ ~/.*_history ]; then
         sort -u -o ~/.*_history ~/.*_history
     fi
-    doas apk del grub* syslinux* *-doc
+    doas apk del --purge grub* syslinux* *-doc
+    doas apk cache clean
 }
 EOF
 
@@ -1957,7 +1958,7 @@ finish() {
     sed -i 's|\r||g' /etc/profile.d/*.sh
 
     printf '%s\n' "❯ cleaning packages"
-    apk del '*-doc'
+    apk del --purge '*-doc'
 
     printf '%s\n' "❯ cleaning files"
     rm -rf /var/tmp/*
