@@ -883,7 +883,11 @@ set_fstab() {
     fi
 
     rootUUID="$(blkid $rootDrive -o export | grep '^UUID=')"
-    entry="$rootUUID / $filesystem rw,relatime,compress=zstd:1,discard=async,space_cache,commit=64 0 0"
+
+    if [ $filesystem -ne 'zfs' ]; then
+        entry="$rootUUID / $filesystem rw,relatime,compress=zstd:1,discard=async,space_cache,commit=64 0 0"
+    fi
+
     printf '\n%s\n' "$entry" > /mnt/etc/fstab
 
     bootUUID="$(blkid $bootDrive -o export | grep '^UUID=')"
