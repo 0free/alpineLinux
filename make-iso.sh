@@ -7,13 +7,12 @@ set -- alpine-conf alpine-sdk apk-tools build-base busybox dosfstools fakeroot g
 list=''
 
 for i in $@; do
-   printf '%s\n' $i
    if ! grep -q $i /etc/apk/world; then
       set -- $list $i
    fi
 done
 
-if [ $list -ne '' ]; then
+if [ ! -z $list ]; then
    doas apk add $list
 fi
 
