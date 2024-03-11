@@ -1211,12 +1211,6 @@ EOF
     printf '%s\n' "❯ configuring firewalld"
     sed -i 's|^#.*||' /etc/firewalld/firewalld.conf
 
-    printf '%s\n' "❯ setting ~/"
-    chown -R $user:wheel $HOME/
-    chown -R $user:wheel $HOME/.config/
-    chmod -R 700 $HOME/
-    chmod -R 700 $HOME/.config/
-
     sed -i 's|step=.*|step=7|' $f
 
 }
@@ -1267,6 +1261,12 @@ setup_desktop() {
             rm -r $HOME/kde/
         fi
     fi
+
+    printf '%s\n' "❯ setting ~/"
+    chown -R $user:wheel $HOME/
+    chown -R $user:wheel $HOME/.config/
+    chmod -R 700 $HOME/
+    chmod -R 700 $HOME/.config/
 
     if [ -f /etc/sddm.conf ]; then
         cat > /etc/sddm.conf <<EOF
