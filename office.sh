@@ -77,7 +77,7 @@ fi
 
 if [ ! -f /usr/bin/wine	]; then
     printf '%s\n' '❯ installing wine'
-    doas apk add wine
+    doas apk add wine-staging
 fi
 
 printf '%s\n' '❯ installing Office 2021 using wine'
