@@ -4,17 +4,11 @@ clear && cd ~
 
 set -- alpine-conf alpine-sdk apk-tools build-base busybox dosfstools fakeroot git mtools squashfs-tools xorriso grub grub-efi
 
-list=''
-
 for i in $@; do
    if ! grep -q $i /etc/apk/world; then
-      set -- $list $i
+      doas apk add $i
    fi
 done
-
-if [ ! -z $list ]; then
-   doas apk add $list
-fi
 
 USER=$(whoami)
 
