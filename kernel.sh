@@ -161,6 +161,7 @@ kernel() {
                 printf '%s\n' "❯ adding gummiboot entry"
                 cat > ~/linux-$kernelVersion.conf <<EOF
 title linux-$kernelVersion
+architecture x64
 linux /vmlinuz-$kernelVersion
 initrd /initramfs-$kernelVersion
 EOF
@@ -171,7 +172,7 @@ EOF
                         break
                     fi
                 done
-                doas cp --no-preserve=mode,ownership ~/linux-$kernelVersion.conf /boot/loader/entries/
+                doas cp ~/linux-$kernelVersion.conf /boot/loader/entries/
                 rm ~/linux-$kernelVersion.conf
             fi
 
