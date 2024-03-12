@@ -1059,6 +1059,7 @@ enable_services() {
     add_service shutdown 'mount-ro killprocs savecache'
     #busybox
     add_service sysinit 'mdev'
+    add_service boot 'ntpd'
     add_service default 'acpid crond syslog'
     #rsyslog
     add_service default 'rsyslog'
