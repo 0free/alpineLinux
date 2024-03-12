@@ -1054,7 +1054,7 @@ enable_services() {
     printf '%s\n' "❯ enabling services"
     #openrc
     add_service sysinit 'devfs procfs dmesg hwdrivers root'
-    add_service boot 'modules cgroups mtab swap localmount sysctl hostname bootmisc networking machine-idntpd hwclock swclock'
+    add_service boot 'modules cgroups mtab swap localmount sysctl hostname bootmisc networking machine-id ntpd hwclock swclock'
     add_service default 'local'
     add_service shutdown 'mount-ro killprocs savecache'
     #busybox

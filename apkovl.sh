@@ -128,11 +128,13 @@ EOF
 
 fi
 
-add_service sysinit devfs dmesg mdev hwdrivers modloop udev udev-trigger udev-settle udev-postmount zfs-import zfs-mount
+add_service sysinit devfs procfs dmesg hwdrivers root mdev modloop udev udev-trigger udev-settle udev-postmount zfs-import zfs-mount
 
-add_service boot procfs devfs sysfs root modules ntpd hwclock swclock sysctl hostname bootmisc syslog dbus networking efivars cgroups zfs-share zfs-zed zfs-load-key
+add_service boot modules cgroups mtab swap localmount sysctl hostname bootmisc networking machine-id ntpd hwclock swclock
 
-add_service default acpid crond iwd networkmanager networkmanager-dispatcher alsa bluez bluealsa bluetooth openrc-settingsd elogind polkit local gdm sddm lightdm
+add_service boot sysfs dbus efivars zfs-share zfs-zed zfs-load-key
+
+add_service default syslog acpid crond iwd networkmanager networkmanager-dispatcher alsa bluez bluealsa bluetooth openrc-settingsd elogind polkit local gdm sddm lightdm
 
 add_service shutdown mount-ro killprocs savecache
 
