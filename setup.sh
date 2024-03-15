@@ -58,7 +58,7 @@ packages_list() {
         networkmanager-elogind
         #firewall
         nftables nftables-openrc
-        firewalld firewalld-openrc
+        firewalld firewalld-openrc firewalld-gui
         #pipewire
         pipewire pipewire-libs pipewire-alsa pipewire-jack pipewire-pulse pipewire-tools pipewire-spa-tools pipewire-spa-vulkan pipewire-spa-bluez wireplumber
         #alsa
