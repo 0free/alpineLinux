@@ -9,7 +9,11 @@ packages_list() {
 
     packages="
         #musl
-        musl musl-dev musl-utils musl-fts musl-fts-dev musl-obstack musl-obstack-dev musl-nscd musl-nscd-dev musl-nscd-openrc musl-legacy-error
+        musl musl-dev musl-utils
+        musl-fts musl-fts-dev
+        musl-obstack musl-obstack-dev
+        musl-nscd musl-nscd-dev musl-nscd-openrc
+        musl-legacy-error
         #glibc
         gcompat
         #dbus
@@ -1837,92 +1841,24 @@ custom_commands() {
     url='https://raw.githubusercontent.com/0free/alpineLinux/edge/apk.sh'
     curl -so /etc/profile.d/apk.sh $url
 
-    cat > /etc/profile.d/commands.sh <<EOF
-search() {
-    apk search
-}
-install() {
-    doas apk add
-}
-remove() {
-    doas apk del --purge
-}
-disk() {
-    lsblk -o name,type,mountpoints,size,fsused,fsuse%,uuid,model
-}
-clean() {
-    printf '%s\n' "❯ cleaning tmp"
-    doas rm -rf /tmp/*
-    doas rm -rf /var/tmp/*
-    printf '%s\n' "❯ cleaning logs"
-    doas rm -f /var/log/*
-    printf '%s\n' "❯ cleaning files"
-    doas find / ! -path './proc/*' -type f -iname 'readme' -o -iname 'readme.txt' -o -iname '*.md' -o -iname '*.rst' -o -iname 'license' -o -iname 'license.txt' -o -iname '*.license' -o -iname '*.docbook' -exec rm -f {} \;
-    if [ ~/.*_history ]; then
-        sort -u -o ~/.*_history ~/.*_history
-    fi
-    doas apk del --purge grub* syslinux* *-doc
-    doas apk cache clean
-}
-EOF
+    printf '%s\n' "❯ downloading commands script"
+    url='https://raw.githubusercontent.com/0free/alpineLinux/edge/commands.sh'
+    curl -so /etc/profile.d/commands.sh $url
 
     if [ -f /usr/bin/yt-dlp ]; then
     cat >> /etc/profile.d/commands.sh <<EOF
+
 youtube() {
     yt-dlp -o '~/%(title)s.%(ext)s' -f 'bv[vcodec~="^((he|a)vc|h26[45])"][height<=1080][fps<=60]+ba' --merge-output-format mp4 --downloader ffmpeg --external-downloader ffmpeg --external-downloader-args ffmpeg:'-ss 00:00:00 -to 03:00:00'
 }
+
 EOF
     fi
-
-    cat >> /etc/profile.d/commands.sh <<EOF
-update() {
-    if curl -so /dev/null alpinelinux.org; then
-        printf '%s\n' "❯ updating alpineLinux packages"
-        if [ -f /lib/apk/db/lock ]; then
-            doas rm /lib/apk/db/lock
-        fi
-        doas apk cache sync
-        doas apk cache clean
-        doas apk fix
-        doas apk update
-        doas apk upgrade
-        if [ -f /usr/bin/fwupdmgr ]; then
-            doas fwupdmgr get-devices
-            doas fwupdmgr refresh
-            doas fwupdmgr get-updates
-            doas fwupdmgr update
-        fi
-        if [ -f /opt/google/chrome/chrome ]; then
-            update_google_chrome
-        fi
-        if [ -f /etc/profile.d/nvidia.sh ]; then
-            nvidia
-        fi
-        if [ -f /etc/profile.d/zfs.sh ]; then
-            update_zfs
-        fi
-EOF
 
     if [ -f /etc/profile.d/trex.sh ]; then
         cat >> /etc/profile.d/commands.sh <<EOF
         if [ -f /etc/profile.d/trex.sh ]; then
             trex
-        fi
-EOF
-    fi
-
-    if [ -f /etc/profile.d/gummiboot.sh ]; then
-        cat >> /etc/profile.d/commands.sh <<EOF
-        if [ -f /etc/profile.d/gummiboot.sh ]; then
-            gummiboot
-        fi
-EOF
-    fi
-
-    if [ -f /etc/profile.d/limine.sh ]; then
-        cat >> /etc/profile.d/commands.sh <<EOF
-        if [ -f /etc/profile.d/limine.sh ]; then
-            limine
         fi
 EOF
     fi
@@ -1934,11 +1870,6 @@ EOF
         fi
 EOF
     fi
-
-    cat >> /etc/profile.d/commands.sh <<EOF
-    fi
-}
-EOF
 
     sed -i 's|step=.*|step=12|' $f
 
